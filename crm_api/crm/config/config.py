@@ -6,8 +6,6 @@ class Settings(BaseSettings):
     secret: str
     access_token_expire_minutes: int    
     algorithm: str
-    usr: str
-    pasw: str
     
     app_name: str = 'CRM-API'
     app_description: str = 'API para la gestión del CRM' 

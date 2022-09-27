@@ -47,4 +47,16 @@ git branch login            --->    Comienza una nueva versión del proyecto si 
 git checkout login          --->    Cambia a la rama Login
 
 
+- Para descargar el proyecto
 
+git clone https://github.com/malaudiaz/crm-api.git
+
+cd crm-api
+
+poetry init
+
+poetry shell
+
+poetry add fastapi uvicorn alembic psycopg2-binary itsdangerous passlib fastapi-sqlalchemy python-dotenv PyJWT
+
+poetry run python crm_api/main.py 

@@ -15,9 +15,23 @@ dictConfig(settings.log_config)
 
 app = FastAPI(
     title=settings.app_name,
-    description=settings.app_description,from crm.routes.business import business_route
-from crm.routes.skeleton import skeleton_route
+    description=settings.app_description,
+    version=settings.app_version,
+    docs_url=None, redoc_url=None
+)
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# Dependency
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(SessionMiddleware, secret_key=settings.secret)
 
 from crm.routes.auth import auth_routes
 from crm.routes.user import user_route

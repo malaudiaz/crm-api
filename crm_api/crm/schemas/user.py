@@ -1,6 +1,6 @@
 """coding=utf-8."""
  
-from typing import List, Optional
+from typing import Optional
 from pydantic import BaseModel
 from uuid import UUID
  
@@ -10,7 +10,6 @@ class UserBase(BaseModel):
     dni: str
     email: str
     phone: str
-    skeleton_id: str
 
 class UserLogin(BaseModel):
     username: str

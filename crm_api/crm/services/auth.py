@@ -1,8 +1,6 @@
 # auth.py
 from fastapi import Request, HTTPException
-from crm.models.business import Business
 from crm.models.user import Users
-from crm.models.skeleton import Skeleton
 from jwt import encode
 from crm.auth_bearer import decodeJWT
 from datetime import datetime, timedelta

@@ -1,7 +1,7 @@
 """coding=utf-8."""
 
 import uuid
-from sqlalchemy import Column, ForeignKey
+from sqlalchemy import Column
 from sqlalchemy.sql.sqltypes import String, Boolean
 from ..config.db import Base
 

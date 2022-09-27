@@ -2,8 +2,6 @@
 
 from fastapi import HTTPException, Request
 from crm.models.user import Users
-from crm.models.business import Business
-from crm.models.skeleton import Skeleton
 from crm.schemas.user import UserCreate, UserShema
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError

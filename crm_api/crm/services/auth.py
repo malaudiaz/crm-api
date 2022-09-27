@@ -46,7 +46,7 @@ def auth(db: Session, user: UserLogin):
     if pwd_context.verify(user.password, data.password):
         db_user = db.query(Users).where(Users.username == user.username).first()  
         
-        token_data = {"username": db_user.Users.username, "user_id": db_user.Users.id}
+        token_data = {"username": data.username, "user_id": data.id}
 
         return JSONResponse(content={"token": write_token(data=token_data), "token_type": "Bearer"}, status_code=200)
 

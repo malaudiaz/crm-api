@@ -1,12 +1,14 @@
 # users.py
 
-from fastapi import HTTPException, Request
+from fastapi import HTTPException
 from crm.models.user import Users
 from crm.schemas.user import UserCreate, UserShema
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from passlib.context import CryptContext
 from crm.auth_bearer import decodeJWT
+from typing import List
+
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -47,17 +49,17 @@ def password_check(passwd, min_len, max_len):
 
     return RespObj
 
-def get_all(request: Request, skip: int, limit: int, db: Session):  
+def get_all(request: List[UserShema], skip: int, limit: int, db: Session):  
     user = decodeJWT(request.headers['authorization'].split(' ')[1]) 
     
     data = db.query(Users).offset(skip).limit(limit).all()    
   
-    lst_users = []
-    for row in data:
-        user =row.Users
-        lst_users.append(UserShema(id=user.id, username=user.username, fullname=user.fullname, dni=user.dni, email=user.email, phone=user.phone, skeleton_id=user.skeleton_id, password=user.password, is_active=user.is_active))    
+    # lst_users = []
+    # for row in data:
+    #     user =row.Users
+    #     lst_users.append(UserShema(id=user.id, username=user.username, fullname=user.fullname, dni=user.dni, email=user.email, phone=user.phone, skeleton_id=user.skeleton_id, password=user.password, is_active=user.is_active))    
               
-    return lst_users
+    return data
         
 def new(db: Session, user: UserCreate):
     pass_check = password_check(user.password, 8, 15)   

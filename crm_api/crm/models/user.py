@@ -1,9 +1,12 @@
 """coding=utf-8."""
 
+import uuid
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import String, Boolean
 from ..config.db import Base
-from ..models.business import generate_uuid
+
+def generate_uuid():
+    return str(uuid.uuid4())
 
 class Users(Base):
     """Users Class contains standard information for a User."""
@@ -20,7 +23,7 @@ class Users(Base):
     password = Column(String(255), nullable=False)
     is_active = Column(Boolean, nullable=False, default=True)
     
-    skeleton_id = Column(String, ForeignKey("enterprise.skeleton.id"), comment="Departamento del Usuario")   # FK added    
+    # skeleton_id = Column(String, ForeignKey("enterprise.skeleton.id"), comment="Departamento del Usuario")   # FK added    
         
     def dict(self):
         return {
@@ -31,7 +34,6 @@ class Users(Base):
             "email": self.email,
             "phone": self.phone,
             "password": self.password,
-            "skeleton_id": self.skeleton_id,
             "is_active": self.is_active
         }
     

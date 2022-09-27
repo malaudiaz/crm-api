@@ -52,15 +52,7 @@ def password_check(passwd, min_len, max_len):
 def get_all(request: Request, skip: int, limit: int, db: Session):  
     user = decodeJWT(request.headers['authorization'].split(' ')[1]) 
     
-    data = db.query(
-        Business.id, 
-        Skeleton.id, 
-        Users
-    ).filter(
-        Business.id == Skeleton.business_id
-    ).filter(
-        Skeleton.id == Users.skeleton_id
-    ).where(Business.id == user["business_id"]).offset(skip).limit(limit).all()    
+    data = db.query(Users).offset(skip).limit(limit).all()    
   
     lst_users = []
     for row in data:
@@ -70,17 +62,12 @@ def get_all(request: Request, skip: int, limit: int, db: Session):
     return lst_users
         
 def new(db: Session, user: UserCreate):
-    db_skeleton = db.query(Skeleton).filter(Skeleton.id == str(user.skeleton_id)).first()
-    
-    if db_skeleton is None:
-        raise HTTPException(status_code=404, detail="Error en los datos, el Departamento no existe")             
-
     pass_check = password_check(user.password, 8, 15)   
     if not pass_check['success']:
         raise HTTPException(status_code=404, detail="Error en los datos, " + pass_check['message'])             
     
     user.password = pwd_context.hash(user.password)  
-    db_user = Users(username=user.username, fullname=user.fullname, dni=user.dni, email=user.email, phone=user.phone, password=user.password, skeleton_id=user.skeleton_id)
+    db_user = Users(username=user.username, fullname=user.fullname, dni=user.dni, email=user.email, phone=user.phone, password=user.password)
     
     try:
         db.add(db_user)
@@ -113,19 +100,13 @@ def delete(user_id: str, db: Session):
         raise HTTPException(status_code=404, detail="No es posible eliminar")
     
 def update(user_id: str, user: UserCreate, db: Session):
-    
-    db_skeleton = db.query(Skeleton).filter(Skeleton.id == str(user.skeleton_id)).first()
-    
-    if db_skeleton is None:
-        raise HTTPException(status_code=404, detail="Error en los datos, el Departamento no existe")               
-    
+       
     db_user = db.query(Users).filter(Users.id == user_id).first()
     db_user.username = user.username
     db_user.fullname = user.fullname
     db_user.dni = user.dni
     db_user.email = user.email
     db_user.phone = user.phone
-    db_user.skeleton_id = user.skeleton_id
 
     try:
         db.add(db_user)

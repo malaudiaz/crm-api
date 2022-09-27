@@ -43,23 +43,12 @@ def get_login_user(request: Request):
 def auth(db: Session, user: UserLogin): 
     data = db.query(Users).filter(Users.username == user.username).first()
     if data is None:
-        if user.username == settings.usr and user.password == settings.pasw:
-            token_data = {"username": user.username}
-            return JSONResponse(content={"token": write_token(data=token_data), "token_type": "Bearer"}, status_code=200)
-        else:    
-            raise HTTPException(status_code=404, detail="Usuario no encontrado")
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
     
     if pwd_context.verify(user.password, data.password):
-        db_user = db.query(
-            Business.id, 
-            Users
-        ).filter(
-            Business.id == Skeleton.business_id
-        ).filter(
-            Skeleton.id == Users.skeleton_id
-        ).where(Users.username == user.username).first()  
+        db_user = db.query(Users).where(Users.username == user.username).first()  
         
-        token_data = {"business_id": db_user.id, "username": db_user.Users.username, "user_id": db_user.Users.id, "skeleton_id": db_user.Users.skeleton_id}
+        token_data = {"username": db_user.Users.username, "user_id": db_user.Users.id}
 
         return JSONResponse(content={"token": write_token(data=token_data), "token_type": "Bearer"}, status_code=200)
 

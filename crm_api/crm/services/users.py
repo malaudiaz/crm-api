@@ -50,15 +50,7 @@ def password_check(passwd, min_len, max_len):
     return RespObj
 
 def get_all(request: List[UserShema], skip: int, limit: int, db: Session):  
-    user = decodeJWT(request.headers['authorization'].split(' ')[1]) 
-    
-    data = db.query(Users).offset(skip).limit(limit).all()    
-  
-    # lst_users = []
-    # for row in data:
-    #     user =row.Users
-    #     lst_users.append(UserShema(id=user.id, username=user.username, fullname=user.fullname, dni=user.dni, email=user.email, phone=user.phone, skeleton_id=user.skeleton_id, password=user.password, is_active=user.is_active))    
-              
+    data = db.query(Users).offset(skip).limit(limit).all()                  
     return data
         
 def new(db: Session, user: UserCreate):

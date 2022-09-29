@@ -36,6 +36,7 @@ app.add_middleware(SessionMiddleware, secret_key=settings.secret)
 from crm.routes.auth import auth_routes
 from crm.routes.user import user_route
 from crm.routes.options import options_route
+from crm.routes.partner.partner import partner_route
 
 @app.get("/docs", include_in_schema=False)
 async def custom_swagger_ui_html():
@@ -64,3 +65,4 @@ async def redoc_html():
 app.include_router(auth_routes, prefix="/api")
 app.include_router(user_route, prefix="/api")
 app.include_router(options_route, prefix="/api")
+app.include_router(partner_route, prefix="/api")

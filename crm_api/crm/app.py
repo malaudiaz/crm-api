@@ -1,5 +1,6 @@
 # app.py
 
+from sys import prefix
 from fastapi import FastAPI
 from crm.config.config import settings
 from fastapi.middleware.cors import CORSMiddleware
@@ -36,6 +37,8 @@ app.add_middleware(SessionMiddleware, secret_key=settings.secret)
 from crm.routes.auth import auth_routes
 from crm.routes.user import user_route
 from crm.routes.options import options_route
+from crm_api.crm.routes.invoices.invoice import invoice_route
+from crm_api.crm.routes.resources.status import status_route
 
 @app.get("/docs", include_in_schema=False)
 async def custom_swagger_ui_html():
@@ -64,3 +67,5 @@ async def redoc_html():
 app.include_router(auth_routes, prefix="/api")
 app.include_router(user_route, prefix="/api")
 app.include_router(options_route, prefix="/api")
+app.include_router(invoice_route, prefix="/api")
+app.include_router(status_route, prefix="/api")

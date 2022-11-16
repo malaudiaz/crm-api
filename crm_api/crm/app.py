@@ -37,9 +37,11 @@ app.add_middleware(SessionMiddleware, secret_key=settings.secret)
 from crm.routes.auth import auth_routes
 from crm.routes.user import user_route
 from crm.routes.options import options_route
-from crm_api.crm.routes.invoices.invoice import invoice_route
-from crm_api.crm.routes.resources.status import status_route
+from crm.routes.invoices.invoice import invoice_route
+from crm.routes.resources.status import status_route
 from crm.routes.partner.partner import partner_route
+from crm.routes.stock.warehouse import warehouse_route
+from crm.routes.stock.location import location_route
 
 @app.get("/docs", include_in_schema=False)
 async def custom_swagger_ui_html():
@@ -71,3 +73,5 @@ app.include_router(options_route, prefix="/api")
 app.include_router(invoice_route, prefix="/api")
 app.include_router(status_route, prefix="/api")
 app.include_router(partner_route, prefix="/api")
+app.include_router(warehouse_route, prefix="/api/stock")
+app.include_router(location_route, prefix="/api/location")

@@ -30,7 +30,7 @@ class Location(Base):
     warehouse_id = Column(String, ForeignKey("stock.warehouse.id"))
     
     warehouse = relationship("Warehouse", back_populates="locations")
-    # movements = relationship("Movement", back_populates="locations")
+    # movements = relationship("Movement")
 
     def dict(self):
         return {
@@ -45,5 +45,6 @@ class Location(Base):
             "updated_by": self.updated_by,
             "updated_date": self.updated_date,
             # "movements": self.movements,
-            "warehouse_id": self.warehouse_id
+            "warehouse_id": self.warehouse_id,
+            "warehouse_name": self.warehouse.name
         }

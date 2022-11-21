@@ -3,8 +3,7 @@
 from datetime import datetime
 from typing import Optional, List
 from pydantic import BaseModel
-# from crm.schemas.stock.location import LocationBase
-from ...models.stock.location import Location
+from ...schemas.stock.location import LocationWarehouseSchema
 from uuid import UUID
 
 class WarehouseBase(BaseModel):
@@ -20,19 +19,10 @@ class WarehouseSchema(WarehouseBase):
     is_active: bool
     created_date: datetime
     updated_date: datetime
-    locations: List[Location] = []
+    locations: List[LocationWarehouseSchema] = []
     
     class Config:
-        arbitrary_types_allowed = True
+        # arbitrary_types_allowed = True
         orm_mode = True
-
-# class WarehouseShema(WarehouseBase):
-#     id: UUID
-#     is_active: bool
-#     created_date: datetime
-#     updated_date: datetime
- 
-#     class Config:
-#         orm_mode = True
-        
+       
         

@@ -7,7 +7,9 @@ from sqlalchemy import Column, ForeignKey, Integer
 from sqlalchemy.sql.sqltypes import String, Boolean, DateTime
 from ...config.db import Base
 from sqlalchemy.orm import relationship
-from crm.models.stock.location import Location
+from ...models.stock.location import Location
+from ...models.resources.status import StatusElement
+# from ...models.stock.product import Product
 
 def generate_uuid():
     return str(uuid.uuid4())
@@ -31,8 +33,10 @@ class Movement(Base):
     updated_by = Column(String(50), nullable=False)
     updated_date = Column(DateTime, nullable=False, default=datetime.now())
         
-    location_source = relationship("Location", back_populates="movements")
-    location_destiny = relationship("Location", back_populates="movements")
+    location_source = relationship("Location", foreign_keys=[source])
+    location_destiny = relationship("Location", foreign_keys=[destiny])
+    status = relationship("StatusElement")
+    product = relationship("Product", back_populates="movements")
 
     def dict(self):
         return {
@@ -49,5 +53,8 @@ class Movement(Base):
             "updated_by": self.updated_by,
             "updated_date": self.updated_date,
             "location_source": self.location_source,
-            "location_destiny": self.location_destiny
+            "location_destiny": self.location_destiny,
+            "status_name": self.status.name,
+            "product_name": self.product.name,
+            "product_description": self.product.description
         }

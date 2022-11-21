@@ -2,12 +2,15 @@
 
 from unicodedata import name
 from fastapi import HTTPException
-from crm.models.partner.partner import Partner
-from crm.schemas.partner.partner import PartnerBase, PartnerShema
+# from crm.models.partner.partner import Partner
+from ...models.partner.partner import Partner
+# from crm.schemas.partner.partner import PartnerBase, PartnerShema
+from ...schemas.partner.partner import PartnerBase, PartnerShema
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from passlib.context import CryptContext
-from crm.auth_bearer import decodeJWT
+# from crm.auth_bearer import decodeJWT
+from ...auth_bearer import decodeJWT
 from typing import List
 
 def get_all(request: List[PartnerShema], skip: int, limit: int, db: Session):  

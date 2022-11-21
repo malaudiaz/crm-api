@@ -1,11 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
-from crm_api.crm.schemas.invoices.invoice import InvoiceBase, InvoiceShema, InvoiceImports
+# from crm.schemas.invoices.invoice import InvoiceBase, InvoiceShema, InvoiceImports
+from ...schemas.invoices.invoice import InvoiceBase, InvoiceImports, InvoiceShema
 from sqlalchemy.orm import Session
-from crm.app import get_db
+# from crm.app import get_db
+from ...app import get_db
 from typing import List
-from crm_api.crm.services.invoices.invoices import get_all, new, get_one, delete, update, update_real_imports
+# from crm.services.invoices.invoices import get_all, new, get_one, delete, update, update_real_imports
+from ...services.invoices.invoices import get_all, new, get_one, update_real_imports, update, delete
 from starlette import status
-from crm.auth_bearer import JWTBearer
+# from crm.auth_bearer import JWTBearer
+from ...auth_bearer import JWTBearer
 import uuid
   
 invoice_route = APIRouter(

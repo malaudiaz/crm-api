@@ -1,13 +1,17 @@
 # Routes user.py
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from crm.schemas.partner.partner import PartnerBase, PartnerShema
+# from crm.schemas.partner.partner import PartnerBase, PartnerShema
+from ...schemas.partner.partner import PartnerBase, PartnerShema
 from sqlalchemy.orm import Session
-from crm.app import get_db
+# from crm.app import get_db
+from ...app import get_db
 from typing import List
-from crm.services.partner.partners import get_all, new, get_one, delete, update
+# from crm.services.partner.partners import get_all, new, get_one, delete, update
+from ...services.partner.partners import get_all, new, get_one, delete, update
 from starlette import status
-from crm.auth_bearer import JWTBearer
+# from crm.auth_bearer import JWTBearer
+from ...auth_bearer import JWTBearer
 import uuid
   
 partner_route = APIRouter(

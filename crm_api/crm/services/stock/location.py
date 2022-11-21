@@ -1,17 +1,21 @@
-# partner.py
+# location.py
 
 from unicodedata import name
 from fastapi import HTTPException
-from crm.models.stock.location import Location
-from crm.schemas.stock.location import LocationBase, LocationSchema, UpdateLocation
+from ...models.stock.location import Location
+from ...schemas.stock.location import LocationBase, LocationSchema, UpdateLocation
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from passlib.context import CryptContext
-from crm.auth_bearer import decodeJWT
+from ...auth_bearer import decodeJWT
 from typing import List
 
 def get_all(request: List[LocationSchema], skip: int, limit: int, db: Session):  
-    data = db.query(Location).offset(skip).limit(limit).all()                  
+    lst = db.query(Location).offset(skip).limit(limit).all()                  
+    
+    data = []
+    for item in lst:
+        data.append(item.dict())
     return data
         
 def new(db: Session, location: LocationBase):
@@ -34,7 +38,12 @@ def new(db: Session, location: LocationBase):
             raise HTTPException(status_code=403, detail=msg)
     
 def get_one(location_id: str, db: Session):  
-    return db.query(Location).filter(Location.id == location_id).first()
+    location = db.query(Location).filter(Location.id == location_id).first()
+
+    data = {}
+    if location:
+        data = location.dict()    
+    return data
 
 def delete(location_id: str, db: Session):
     try:

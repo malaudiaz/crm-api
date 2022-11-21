@@ -1,11 +1,14 @@
 from unicodedata import name
 from fastapi import HTTPException
-from crm_api.crm.models.invoices.invoice import Invoice
-from crm_api.crm.schemas.invoices.invoice import InvoiceBase, InvoiceShema, InvoiceImports
+# from crm.models.invoices.invoice import Invoice
+from ...models.invoices.invoice import Invoice
+# from crm.schemas.invoices.invoice import InvoiceBase, InvoiceShema, InvoiceImports
+from ...schemas.invoices.invoice import InvoiceBase, InvoiceShema, InvoiceImports
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from passlib.context import CryptContext
-from crm.auth_bearer import decodeJWT
+# from crm.auth_bearer import decodeJWT
+from ...auth_bearer import decodeJWT
 from typing import List
             
 def get_all(request: List[InvoiceShema], skip: int, limit: int, db: Session):  

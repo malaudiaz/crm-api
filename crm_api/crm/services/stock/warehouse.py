@@ -1,25 +1,27 @@
-# partner.py
+# warehouse.py
 
 from unicodedata import name
 from fastapi import HTTPException
-from crm.models.stock.warehouse import Warehouse
-from crm.schemas.stock.warehouse import WarehouseSchema, WarehouseBase, UpdateWarehouse
+from ...models.stock.warehouse import Warehouse
+from ...schemas.stock.warehouse import WarehouseSchema, WarehouseBase, UpdateWarehouse
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from passlib.context import CryptContext
-from crm.auth_bearer import decodeJWT
+from ...auth_bearer import decodeJWT
 from typing import List
 
 def get_all(request: List[WarehouseSchema], skip: int, limit: int, db: Session):  
-    data = db.query(Warehouse).offset(skip).limit(limit).all()                  
+    lst = db.query(Warehouse).offset(skip).limit(limit).all()                  
+    data = []
+    for item in lst:
+        data.append(item.dict())
     return data
         
 def new(db: Session, warehouse: WarehouseBase):
     
     db_warehouse = Warehouse(name=warehouse.name, code=warehouse.code, address=warehouse.address, 
                              created_by='foo', updated_by='foo')
-    # db_warehouse.locations = []
-    
+        
     try:
         db.add(db_warehouse)
         db.commit()
@@ -37,7 +39,11 @@ def delete(warehouse_id: str, db: Session):
     try:
         db_warehouse = db.query(Warehouse).filter(Warehouse.id == warehouse_id).first()
         db_warehouse.is_active = False
-        db_warehouse.updated_by = 'foo'
+        db_warehouse.updated_by = 'foo' 
+        
+        if len(db_warehouse.locations) != 0:
+            for item in db_warehouse.locations:
+                item.is_active = False
         db.commit()
         return True
     except (Exception, SQLAlchemyError) as e:

@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
-from crm_api.crm.schemas.resources.status_elment import StatusBase, StatusShema
+from crm.schemas.resources.status_elment import StatusBase, StatusShema
 from sqlalchemy.orm import Session
 from crm.app import get_db
 from typing import List
-from crm_api.crm.services.resources.status_element import get_all, get_one_by_name, new, get_one, delete, update
+from crm.services.resources.status_element import get_all, get_one_by_name, new, get_one, delete, update
 from starlette import status
 from crm.auth_bearer import JWTBearer
   

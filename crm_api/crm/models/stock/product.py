@@ -6,6 +6,7 @@ import uuid
 from sqlalchemy import Column, Float, ForeignKey, Integer
 from sqlalchemy.sql.sqltypes import String, Boolean, DateTime
 from ...config.db import Base
+from ...models.stock.movement import Movement
 from sqlalchemy.orm import relationship
 
 def generate_uuid():
@@ -32,11 +33,12 @@ class Product(Base):
     updated_by = Column(String(50), nullable=False)
     updated_date = Column(DateTime, nullable=False, default=datetime.now())
         
-    movements = relationship("movements")
+    movements = relationship("Movement")
 
     def dict(self):
         return {
             "id": self.id,
+            "code": self.code,
             "name": self.name,
             "description": self.description,
             "is_active": self.is_active,

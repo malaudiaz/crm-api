@@ -1,11 +1,14 @@
 from unicodedata import name
 from fastapi import HTTPException
-from crm_api.crm.models.resources.status import StatusElement
-from crm_api.crm.schemas.resources.status_elment import StatusBase, StatusShema
+# from crm.models.resources.status import StatusElement
+from ...models.resources.status import StatusElement
+# from crm.schemas.resources.status_elment import StatusBase, StatusShema
+from ...schemas.resources.status_elment import StatusBase, StatusShema
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from passlib.context import CryptContext
-from crm.auth_bearer import decodeJWT
+# from crm.auth_bearer import decodeJWT
+from ...auth_bearer import decodeJWT
 from typing import List
             
 def get_all(request: List[StatusShema], skip: int, limit: int, db: Session):  

@@ -42,6 +42,8 @@ from crm.routes.resources.status import status_route
 from crm.routes.partner.partner import partner_route
 from crm.routes.stock.warehouse import warehouse_route
 from crm.routes.stock.location import location_route
+from crm.routes.stock.movement import movement_route
+from crm.routes.stock.product import product_route
 
 @app.get("/docs", include_in_schema=False)
 async def custom_swagger_ui_html():
@@ -73,5 +75,7 @@ app.include_router(options_route, prefix="/api")
 app.include_router(invoice_route, prefix="/api")
 app.include_router(status_route, prefix="/api")
 app.include_router(partner_route, prefix="/api")
-app.include_router(warehouse_route, prefix="/api/stock")
-app.include_router(location_route, prefix="/api/location")
+app.include_router(warehouse_route, prefix="/api/stock/warehouse")
+app.include_router(location_route, prefix="/api/stock/location")
+app.include_router(movement_route, prefix="/api/stock/movement")
+app.include_router(product_route, prefix="/api/stock/product")

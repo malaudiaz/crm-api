@@ -1,13 +1,13 @@
-# Routes user.py
+# Routes localtion.py
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from crm.schemas.stock.location import LocationBase, LocationSchema, UpdateLocation
+from ...schemas.stock.location import LocationBase, LocationSchema, UpdateLocation
 from sqlalchemy.orm import Session
-from crm.app import get_db
+from ...app import get_db
 from typing import List
-from crm.services.stock.location import get_all, new, get_one, delete, update
+from ...services.stock.location import get_all, new, get_one, delete, update
 from starlette import status
-from crm.auth_bearer import JWTBearer
+from ...auth_bearer import JWTBearer
 import uuid
   
 location_route = APIRouter(

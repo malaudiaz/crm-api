@@ -7,9 +7,7 @@ import uuid
 from sqlalchemy import Column
 from sqlalchemy.sql.sqltypes import String, Boolean, DateTime
 from ...config.db import Base
-# from crm_api.crm.models.stock.location import Location
-# from crm.models.stock.location import Location
-from ..stock.location import Location
+from ...models.stock.location import Location
 from sqlalchemy.orm import relationship
 
 def generate_uuid():

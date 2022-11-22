@@ -1,7 +1,7 @@
 # Routes localtion.py
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from ...schemas.stock.location import LocationBase, LocationSchema, UpdateLocation
+from ...schemas.stock.location import LocationBase, LocationSchema, UpdateLocation, LocationWarehouseSchema
 from sqlalchemy.orm import Session
 from ...app import get_db
 from typing import List
@@ -24,7 +24,7 @@ def get_locations(
 ):
     return get_all(request=request, skip=skip, limit=limit, db=db)
 
-@location_route.post("/location", response_model=LocationSchema, summary="Crear una localidad")
+@location_route.post("/location", response_model=LocationWarehouseSchema, summary="Crear una localidad")
 def create_location(location: LocationBase, db: Session = Depends(get_db)):
     return new(location=location, db=db)
 

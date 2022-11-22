@@ -9,7 +9,7 @@ from crm.auth_bearer import JWTBearer
   
 status_route = APIRouter(
     tags=["Estado Entidades"],
-    dependencies=[Depends(JWTBearer())]   
+    # dependencies=[Depends(JWTBearer())]   
 )
 
 @status_route.get("/resources/status", response_model=List[StatusShema], summary="Obtener lista de Estado de Entidades")

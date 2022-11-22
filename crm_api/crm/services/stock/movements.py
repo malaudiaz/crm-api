@@ -27,35 +27,6 @@ def new(db: Session, movement: MovementBase):
                            document_number=movement.document_number, status_id=movement.status_id,
                            source=movement.source, destiny=movement.destiny, product_id=movement.product_id,
                            created_by='foo', updated_by='foo', )
-    # buscar el producto para asociarlo al movimiento
-
-    # product = db.query(Product).filter(Product.id == movement.product_id).first() 
-
-    # if not product:
-    #     raise Exception("Error en el movimiento, no existe producto")
-    
-    # db_movement.product = product
-    
-    # buscar el status para asociarlo al movimiento
-    status = db.query(StatusElement).filter(StatusElement.id == int(movement.status_id)).first()
-    
-    # raise Exception(status_element)
-    if not status:
-        raise Exception("No existe estado para el movimiento")
-
-    # db_movement.status = status
-    # buscando localidades de origen y destino
-    # location_source = db.query(Location).filter(Location.id == movement.source).first()
-    # location_destiny = db.query(Location).filter(Location.id == movement.destiny).first()
-
-    # if not location_source:
-    #     raise Exception("No existe localización de origen")
-
-    # if not location_destiny:
-    #     raise Exception("No existe localización destino")
-
-    # db_movement.location_source = location_source    
-    # db_movement.location_destiny = location_destiny       
     
     # try:
     db.add(db_movement)

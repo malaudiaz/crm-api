@@ -10,8 +10,6 @@ from crm.config.db import SessionLocal
 from fastapi.openapi.docs import (get_redoc_html, get_swagger_ui_html, get_swagger_ui_oauth2_redirect_html)
 from fastapi.staticfiles import StaticFiles
 
-# import logging
-
 dictConfig(settings.log_config)
 
 app = FastAPI(

@@ -55,7 +55,7 @@ class Movement(Base):
             "location_source": self.location_source,
             "location_destiny": self.location_destiny,
             "status": self.status,
-            "status_name": self.status.name,
+            # "status_name": self.status.name,
             "product": self.product,
             "product_name": self.product.name,
             "product_description": self.product.description

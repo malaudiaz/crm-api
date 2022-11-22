@@ -3,6 +3,7 @@
 from datetime import datetime
 from pydantic import BaseModel
 from uuid import UUID
+from ...schemas.resources.status_elment import StatusShema
 
 class MovementBase(BaseModel):
     quantity: int
@@ -17,11 +18,10 @@ class MovementShema(MovementBase):
     id: UUID
     created_date: datetime
     updated_date: datetime
-    # status_name: str
-    # product_name: str
-    # product_description: str
-    # location_source: str
-    # location_destiny: str
+    status: StatusShema
+    product_name: str
+    product_description: str
+    
  
     class Config:
         orm_mode = True
@@ -30,10 +30,7 @@ class MovementLocShema(MovementBase):
     id: UUID
     created_date: datetime
     updated_date: datetime
-    status_name: str
-    product_name: str
-    product_description: str
-     
+         
     class Config:
         orm_mode = True
 

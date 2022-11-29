@@ -17,7 +17,6 @@ class Users(Base):
     id = Column(String, primary_key=True, default=generate_uuid)
     username = Column(String(50), nullable=False, unique=True)
     fullname = Column(String(100), nullable=False)
-    job = Column(String(50), nullable=False)
     dni = Column(String(11), nullable=False, unique=True)
     email = Column(String(50), nullable=False, unique=True)
     phone = Column(String(8), nullable=False, unique=True)
@@ -31,7 +30,6 @@ class Users(Base):
             "id": self.id,
             "username": self.username,
             "fullname": self.fullname,
-            "job": self.job,
             "dni": self.dni,
             "email": self.email,
             "phone": self.phone,

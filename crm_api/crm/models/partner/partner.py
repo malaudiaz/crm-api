@@ -3,9 +3,10 @@
 from datetime import datetime
 from email.policy import default
 import uuid
-from sqlalchemy import Column
-from sqlalchemy.sql.sqltypes import String, Boolean, DateTime
+from sqlalchemy import Column, ForeignKey, Integer
+from sqlalchemy.sql.sqltypes import String, Boolean, DateTime, Integer, Date
 from ...config.db import Base
+from sqlalchemy.orm import relationship
 
 def generate_uuid():
     return str(uuid.uuid4())
@@ -21,8 +22,8 @@ class Partner(Base):
     address = Column(String(400), nullable=True)
     dni = Column(String(30), nullable=False)
     email = Column(String(100), nullable=True)
-    phone = Column(String(8), nullable=True)
-    mobile = Column(String(8), nullable=True)
+    phone = Column(String(60), nullable=True)
+    mobile = Column(String(60), nullable=True)
     nit = Column(String(11), nullable=True)
     is_active = Column(Boolean, nullable=False, default=True)
     is_provider = Column(Boolean, nullable=False, default=False)
@@ -30,6 +31,13 @@ class Partner(Base):
     created_date = Column(DateTime, nullable=False, default=datetime.now())
     updated_by = Column(String(50), nullable=False)
     updated_date = Column(DateTime, nullable=False, default=datetime.now())
+    registration_number = Column(Integer, nullable=True)
+    registration_user = Column(String(350), nullable=True)
+    registration_date = Column(Date, nullable=True)
+    type = Column(String(60), nullable=False)   # tipo de Cliente
+    
+    contacts = relationship("PartnerContact", back_populates="partner")
+    contracts = relationship("Contract", back_populates="partner")
     
     # skeleton_id = Column(String, ForeignKey("enterprise.skeleton.id"), comment="Departamento del Usuario")   # FK added    
         
@@ -49,6 +57,11 @@ class Partner(Base):
             "created_date": self.created_date,
             "updated_by": self.updated_by,
             "updated_date": self.updated_date,
+            "registration_number": self.registration_number,
+            "registration_user": self.registration_user,
+            "registration_date": self.registration_date,
+            "type": self.type
         }
     
 # Base.metadata.create_all(bind=engine)
+        

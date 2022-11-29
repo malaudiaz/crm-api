@@ -2,27 +2,50 @@
 
 from unicodedata import name
 from fastapi import HTTPException
-# from crm.models.partner.partner import Partner
 from ...models.partner.partner import Partner
-# from crm.schemas.partner.partner import PartnerBase, PartnerShema
 from ...schemas.partner.partner import PartnerBase, PartnerShema
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from passlib.context import CryptContext
-# from crm.auth_bearer import decodeJWT
 from ...auth_bearer import decodeJWT
 from typing import List
 
-def get_all(request: List[PartnerShema], skip: int, limit: int, db: Session):  
-    data = db.query(Partner).offset(skip).limit(limit).all()                  
-    return data
+def get_all(totalCount: int, skip: int, limit: int, db: Session, name=''):  
+    
+    str_query = "Select count(*) FROM partner.partners where is_active=True "
+    if name:
+        str_query += " AND name ilike '%" + name + "%'"
         
+    totalCount = db.execute(str_query).scalar() if totalCount == 0 else totalCount
+    if name:
+        data = db.query(Partner).filter(Partner.name.ilike(f'%{name}%')).offset(skip).limit(limit).all() 
+    else:
+        data = db.query(Partner).offset(skip).limit(limit).all()  
+         
+    return {'totalCount': int(totalCount), 'lst_data': data}
+
+def get_one(partner_id: str, db: Session):  
+    return db.query(Partner).filter(Partner.id == partner_id).first()
+
+def get_one_by_registration_number(registration_number: str, db: Session):  
+    return db.query(Partner).filter(Partner.registration_number == registration_number).first()
+
+def get_by_name(request: List[PartnerShema], name: str, skip: int, limit: int, db: Session):  
+    return db.query(Partner).filter(Partner.name.ilike(f'%{name}%')).offset(skip).limit(limit).all() 
+
+def get_by_dni(equest: List[PartnerShema], dni: str, skip: int, limit: int, db: Session):  
+    return db.query(Partner).filter(Partner.dni.ilike(f'%{dni}%')).offset(skip).limit(limit).all()
+
+def get_by_nit(equest: List[PartnerShema], nit: str, skip: int, limit: int, db: Session):  
+    return db.query(Partner).filter(Partner.nit.ilike(f'%{nit}%')).offset(skip).limit(limit).all()
+
 def new(db: Session, partner: PartnerBase):
     
-    db_partner = Partner(name=partner.name, address=partner.address, dni=partner.dni, 
+    db_partner = Partner(type=partner.type, name=partner.name, address=partner.address, dni=partner.dni, 
                          email=partner.email, phone=partner.phone, mobile=partner.mobile, nit=partner.nit,
-                         created_by='foo', updated_by='foo')
-    
+                         registration_number=partner.registration_number, registration_user=partner.registration_user,
+                         registration_date=partner.registration_date, created_by='foo', updated_by='foo')
+  
     try:
         db.add(db_partner)
         db.commit()
@@ -33,9 +56,6 @@ def new(db: Session, partner: PartnerBase):
         msg = 'Ha ocurrido un error al crear el cliente'               
         raise HTTPException(status_code=403, detail=msg)
     
-def get_one(partner_id: str, db: Session):  
-    return db.query(Partner).filter(Partner.id == partner_id).first()
-
 def delete(partner_id: str, db: Session):
     try:
         db_partner = db.query(Partner).filter(Partner.id == partner_id).first()
@@ -52,6 +72,7 @@ def update(partner_id: str, partner: PartnerBase, db: Session):
     db_partner = db.query(Partner).filter(Partner.id == partner_id).first()
     db_partner.is_active = False
     db_partner.updated_by = 'foo'
+    db_partner.type=partner.type
     db_partner.name=partner.name
     db_partner.address=partner.address
     db_partner.dni=partner.dni
@@ -59,6 +80,9 @@ def update(partner_id: str, partner: PartnerBase, db: Session):
     db_partner.phone=partner.phone
     db_partner.mobile=partner.mobile
     db_partner.nit=partner.nit
+    db_partner.registration_number=partner.registration_number
+    db_partner.registration_user=partner.registration_user
+    db_partner.registration_date=partner.registration_date
 
     try:
         db.add(db_partner)
@@ -68,4 +92,4 @@ def update(partner_id: str, partner: PartnerBase, db: Session):
     except (Exception, SQLAlchemyError) as e:
         print(e.code)
         if e.code == "gkpj":
-            raise HTTPException(status_code=400, detail="Ya existe un usuario con este Nombre")
+            raise HTTPException(status_code=400, detail="Ya existe un cliente Registrado")

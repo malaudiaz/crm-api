@@ -7,6 +7,7 @@ class UserBase(BaseModel):
     username: str
     fullname: str
     dni: str
+    job: str
     email: str
     phone: str
 

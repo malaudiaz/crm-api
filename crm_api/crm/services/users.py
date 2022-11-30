@@ -59,7 +59,7 @@ def new(db: Session, user: UserCreate):
         raise HTTPException(status_code=404, detail="Error en los datos, " + pass_check['message'])             
     
     user.password = pwd_context.hash(user.password)  
-    db_user = Users(username=user.username, fullname=user.fullname, dni=user.dni, email=user.email, phone=user.phone, password=user.password)
+    db_user = Users(username=user.username, fullname=user.fullname, dni=user.dni, job=user.job, email=user.email, phone=user.phone, password=user.password)
     
     try:
         db.add(db_user)
@@ -97,6 +97,7 @@ def update(user_id: str, user: UserCreate, db: Session):
     db_user.username = user.username
     db_user.fullname = user.fullname
     db_user.dni = user.dni
+    db_user.job = user.job
     db_user.email = user.email
     db_user.phone = user.phone
 

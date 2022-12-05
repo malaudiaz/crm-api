@@ -1,5 +1,6 @@
 # partner.py
 
+import math
 from unicodedata import name
 from fastapi import HTTPException
 from ...models.partner.partner import Partner
@@ -10,7 +11,23 @@ from passlib.context import CryptContext
 from ...auth_bearer import decodeJWT
 from typing import List
 
-def get_all(totalCount: int, skip: int, limit: int, db: Session, name=''):  
+def get_all(page: int, per_page: int, db: Session, name=''):  
+    
+    str_query = "Select count(*) FROM partner.partners where is_active=True "
+    if name:
+        str_query += " AND name ilike '%" + name + "%'"
+        
+    total = db.execute(str_query).scalar()
+    total_pages=total/per_page if (total % per_page == 0) else math.trunc(total / per_page) + 1
+    
+    if name:
+        data = db.query(Partner).filter(Partner.name.ilike(f'%{name}%')).offset(page*per_page-per_page).limit(per_page).all() 
+    else:
+        data = db.query(Partner).offset(page*per_page-per_page).limit(per_page).all()  
+         
+    return {"page": page, "per_page": per_page, "total": total, "total_pages": total_pages, "data": data}
+
+def get_all_old(totalCount: int, skip: int, limit: int, db: Session, name=''):  
     
     str_query = "Select count(*) FROM partner.partners where is_active=True "
     if name:

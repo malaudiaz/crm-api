@@ -18,14 +18,13 @@ partner_route = APIRouter(
 
 @partner_route.get("/partners", response_model=Dict, summary="Obtener lista de Clientes")
 def get_partners(
-    totalCount: int = 0,
-    skip: int = 0, 
-    limit: int = 100, 
+    page: int = 0, 
+    per_page: int = 100, 
     name: str = '',
     db: Session = Depends(get_db)
 ):
-    return get_all(totalCount=totalCount, skip=skip, limit=limit, db=db, name=name)
-
+    return get_all(page=page, per_page=per_page, db=db, name=name)
+    
 @partner_route.get("/partners/{id}", response_model=PartnerShema, summary="Obtener un Cliente por su ID")
 def get_partner_by_id(id: str, db: Session = Depends(get_db)):
     return get_one(partner_id=id, db=db)

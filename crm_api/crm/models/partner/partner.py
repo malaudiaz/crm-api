@@ -36,6 +36,8 @@ class Partner(Base):
     registration_date = Column(Date, nullable=True)
     type = Column(String(60), nullable=False)   # tipo de Cliente
     
+    selected = Column(Boolean, nullable=False, default=False)
+    
     contacts = relationship("PartnerContact", back_populates="partner")
     contracts = relationship("Contract", back_populates="partner")
     
@@ -60,7 +62,8 @@ class Partner(Base):
             "registration_number": self.registration_number,
             "registration_user": self.registration_user,
             "registration_date": self.registration_date,
-            "type": self.type
+            "type": self.type,
+            "selected": self.selected
         }
     
 # Base.metadata.create_all(bind=engine)

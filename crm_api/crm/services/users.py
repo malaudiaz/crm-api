@@ -2,12 +2,13 @@
 
 from fastapi import HTTPException
 from crm.models.user import Users
-from crm.schemas.user import UserCreate, UserShema
+from crm.schemas.user import UserCreate, UserBase
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from passlib.context import CryptContext
 from crm.auth_bearer import decodeJWT
 from typing import List
+import math
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -49,18 +50,23 @@ def password_check(passwd, min_len, max_len):
 
     return RespObj
 
-def get_all(request: List[UserShema], skip: int, limit: int, db: Session):  
-    data = db.query(Users).offset(skip).limit(limit).all()                  
-    return data
+def get_all(page: int, per_page: int, db: Session):  
+    total=db.query(Users).count()
+    
+    total_pages=total/per_page if (total % per_page == 0) else math.trunc(total / per_page) + 1
+    
+    data = db.query(Users).offset(page*per_page-per_page).limit(per_page).all()
+    
+    return {"page": page, "per_page": per_page, "total": total, "total_pages": total_pages, "data": data}
         
-def new(db: Session, user: UserCreate):
+def new(db: Session, user: UserCreate):   
     pass_check = password_check(user.password, 8, 15)   
     if not pass_check['success']:
         raise HTTPException(status_code=404, detail="Error en los datos, " + pass_check['message'])             
     
     user.password = pwd_context.hash(user.password)  
-    db_user = Users(username=user.username, fullname=user.fullname, dni=user.dni, job=user.job, email=user.email, phone=user.phone, password=user.password)
-    
+    db_user = Users(username=user.username, fullname=user.fullname, dni=user.dni, job=user.job, email=user.email, phone=user.phone, password=user.password, selected=False)
+        
     try:
         db.add(db_user)
         db.commit()
@@ -91,7 +97,7 @@ def delete(user_id: str, db: Session):
         print(e)
         raise HTTPException(status_code=404, detail="No es posible eliminar")
     
-def update(user_id: str, user: UserCreate, db: Session):
+def update(user_id: str, user: UserBase, db: Session):
        
     db_user = db.query(Users).filter(Users.id == user_id).first()
     db_user.username = user.username

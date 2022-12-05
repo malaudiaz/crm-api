@@ -21,6 +21,7 @@ class UserCreate(UserBase):
 class UserShema(UserCreate):
     id: UUID
     is_active: bool
+    selected: bool = False
  
     class Config:
         orm_mode = True

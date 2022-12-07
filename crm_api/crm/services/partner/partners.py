@@ -37,7 +37,7 @@ def get_all_old(totalCount: int, skip: int, limit: int, db: Session, name=''):
     if name:
         data = db.query(Partner).filter(Partner.name.ilike(f'%{name}%')).offset(skip).limit(limit).all() 
     else:
-        data = db.query(Partner).offset(skip).limit(limit).all()  
+        data = db.query(Partner).filter(Partner.is_active == True).order_by(Partner.dni.asc()).offset(skip).limit(limit).all()  
          
     return {'totalCount': int(totalCount), 'lst_data': data}
 

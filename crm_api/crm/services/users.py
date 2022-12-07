@@ -50,12 +50,26 @@ def password_check(passwd, min_len, max_len):
 
     return RespObj
 
-def get_all(page: int, per_page: int, db: Session):  
-    total=db.query(Users).count()
+def get_all(page: int, per_page: int, username: str, fullname: str, dni: str, db: Session):  
+    if username != "":
+        total=db.query(Users).filter(Users.username.ilike(f'%{username}%')).count()
+    else: 
+        if fullname != "":
+            total=db.query(Users).filter(Users.username.ilike(f'%{username}%')).filter(Users.fullname.ilike(f'%{fullname}%')).count()
+        else:
+            total=db.query(Users).count()
     
     total_pages=total/per_page if (total % per_page == 0) else math.trunc(total / per_page) + 1
-    
-    data = db.query(Users).offset(page*per_page-per_page).limit(per_page).all()
+
+    if username != "":
+        data = db.query(Users).filter(Users.username.ilike(f'%{username}%')).offset(page*per_page-per_page).limit(per_page).all()
+    else:
+        if fullname != "":
+            total=db.query(Users).filter(Users.username.ilike(f'%{username}%')).filter(Users.fullname.ilike(f'%{fullname}%')).all()
+        else:
+            data = db.query(Users).offset(page*per_page-per_page).limit(per_page).all()
+
+
     
     return {"page": page, "per_page": per_page, "total": total, "total_pages": total_pages, "data": data}
         

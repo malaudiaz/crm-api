@@ -19,9 +19,12 @@ user_route = APIRouter(
 def get_users(
     page: int = 1, 
     per_page: int = 6, 
+    username: str = "",
+    fullname: str = "",
+    dni: str = "",
     db: Session = Depends(get_db)
 ):
-    return get_all(page=page, per_page=per_page, db=db)
+    return get_all(page=page, per_page=per_page, username=username, fullname=fullname, dni=dni, db=db)
 
 @user_route.post("/users", response_model=UserShema, summary="Crear un Usuario")
 def create_user(user: UserCreate, db: Session = Depends(get_db)):

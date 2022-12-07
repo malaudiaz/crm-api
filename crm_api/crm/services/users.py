@@ -51,25 +51,33 @@ def password_check(passwd, min_len, max_len):
     return RespObj
 
 def get_all(page: int, per_page: int, username: str, fullname: str, dni: str, db: Session):  
-    if username != "":
-        total=db.query(Users).filter(Users.username.ilike(f'%{username}%')).count()
-    else: 
-        if fullname != "":
-            total=db.query(Users).filter(Users.username.ilike(f'%{username}%')).filter(Users.fullname.ilike(f'%{fullname}%')).count()
-        else:
-            total=db.query(Users).count()
     
+    str_where = "WHERE is_active=True " 
+    str_count = "Select count(*) FROM enterprise.users "
+    str_query = "Select id, username, fullname, dni, email, phone FROM enterprise.users "
+    
+    if username:
+        str_where += " AND username ilike '%" + username + "%'"
+        
+    if fullname:
+        str_where += " AND fullname ilike '%" + fullname + "%'"
+    
+    if dni:
+        str_where += " AND dni ilike '%" + dni + "%'"
+        
+    str_count += str_where
+    str_query += str_where
+    
+    total = db.execute(str_count).scalar()
     total_pages=total/per_page if (total % per_page == 0) else math.trunc(total / per_page) + 1
-
-    if username != "":
-        data = db.query(Users).filter(Users.username.ilike(f'%{username}%')).offset(page*per_page-per_page).limit(per_page).all()
-    else:
-        if fullname != "":
-            total=db.query(Users).filter(Users.username.ilike(f'%{username}%')).filter(Users.fullname.ilike(f'%{fullname}%')).all()
-        else:
-            data = db.query(Users).offset(page*per_page-per_page).limit(per_page).all()
-
-
+    
+    str_query += " LIMIT " + str(per_page) + " OFFSET " + str(page*per_page-per_page)
+     
+    lst_data = db.execute(str_query)
+    data = []
+    for item in lst_data:
+        data.append({'id': item['id'], 'username' : item['username'], 'fullname': item['fullname'], 
+                     'dni': item['dni'], 'email': item['email'], 'phone': item['phone'], 'selected': False})
     
     return {"page": page, "per_page": per_page, "total": total, "total_pages": total_pages, "data": data}
         

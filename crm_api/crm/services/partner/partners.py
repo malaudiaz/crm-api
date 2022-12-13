@@ -13,48 +13,42 @@ from typing import List
 
 def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db: Session):  
     
-    str_query = "Select count(*) FROM partner.partners where is_active=True "
-    if name:
-        str_query += " AND name ilike '%" + name + "%'"
-        
-    total = db.execute(str_query).scalar()
+    str_where = "WHERE is_active=True " 
+    str_count = "Select count(*) FROM partner.partners "
+    str_query = "Select id, name, address, dni, email, phone, mobile, nit, is_provider, created_by, created_date, " \
+        "updated_by, updated_date, registration_number, registration_user, registration_date, type FROM partner.partners "
+    
+    dict_query = {'name': " AND name ilike '%" + criteria_value + "%'",
+                  'nit': " AND nit = '" + criteria_value + "'",
+                  'registration_number': " AND registration_number = '" + criteria_value + "'",
+                  'dni': " AND dni ilike '%" + criteria_value + "%'"}
+    
+    str_where = str_where + dict_query[criteria_key] if criteria_value else ""  
+    str_count += str_where 
+    str_query += str_where
+    
+    total = db.execute(str_count).scalar()
     total_pages=total/per_page if (total % per_page == 0) else math.trunc(total / per_page) + 1
     
-    if name:
-        data = db.query(Partner).filter(Partner.name.ilike(f'%{name}%')).offset(page*per_page-per_page).limit(per_page).all() 
-    else:
-        data = db.query(Partner).offset(page*per_page-per_page).limit(per_page).all()  
-         
-    return {"page": page, "per_page": per_page, "total": total, "total_pages": total_pages, "data": data}
-
-def get_all_old(totalCount: int, skip: int, limit: int, db: Session, name=''):  
+    str_query += " ORDER BY name LIMIT " + str(per_page) + " OFFSET " + str(page*per_page-per_page)
+     
+    lst_data = db.execute(str_query)
+    data = []
+    for item in lst_data:
+        data.append({'id': item['id'], 'name' : item['name'], 'address': item['address'], 
+                     'dni': item['dni'], 'email': item['email'], 'phone': item['phone'], 
+                     'mobile': item['mobile'], 'nit': item['nit'], 'is_provider': item['is_provider'], 
+                     'created_by': item['created_by'], 'nit': item['nit'], 'registration_number': item['registration_number'], 
+                     'registration_user': item['registration_user'], 'registration_date': item['registration_date'],  
+                     'selected': False})
     
-    str_query = "Select count(*) FROM partner.partners where is_active=True "
-    if name:
-        str_query += " AND name ilike '%" + name + "%'"
-        
-    totalCount = db.execute(str_query).scalar() if totalCount == 0 else totalCount
-    if name:
-        data = db.query(Partner).filter(Partner.name.ilike(f'%{name}%')).offset(skip).limit(limit).all() 
-    else:
-        data = db.query(Partner).filter(Partner.is_active == True).order_by(Partner.dni.asc()).offset(skip).limit(limit).all()  
-         
-    return {'totalCount': int(totalCount), 'lst_data': data}
+    return {"page": page, "per_page": per_page, "total": total, "total_pages": total_pages, "data": data}
 
 def get_one(partner_id: str, db: Session):  
     return db.query(Partner).filter(Partner.id == partner_id).first()
 
 def get_one_by_registration_number(registration_number: str, db: Session):  
     return db.query(Partner).filter(Partner.registration_number == registration_number).first()
-
-def get_by_name(request: List[PartnerShema], name: str, skip: int, limit: int, db: Session):  
-    return db.query(Partner).filter(Partner.name.ilike(f'%{name}%')).offset(skip).limit(limit).all() 
-
-def get_by_dni(equest: List[PartnerShema], dni: str, skip: int, limit: int, db: Session):  
-    return db.query(Partner).filter(Partner.dni.ilike(f'%{dni}%')).offset(skip).limit(limit).all()
-
-def get_by_nit(equest: List[PartnerShema], nit: str, skip: int, limit: int, db: Session):  
-    return db.query(Partner).filter(Partner.nit.ilike(f'%{nit}%')).offset(skip).limit(limit).all()
 
 def new(db: Session, partner: PartnerBase):
     

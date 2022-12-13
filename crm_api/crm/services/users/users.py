@@ -77,37 +77,6 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
     
     return {"page": page, "per_page": per_page, "total": total, "total_pages": total_pages, "data": data}
 
-def get_all_old(page: int, per_page: int, username: str, fullname: str, dni: str, db: Session):  
-    
-    str_where = "WHERE is_active=True " 
-    str_count = "Select count(*) FROM enterprise.users "
-    str_query = "Select id, username, fullname, dni, email, phone FROM enterprise.users "
-    
-    if username:
-        str_where += " AND username ilike '%" + username + "%'"
-        
-    if fullname:
-        str_where += " AND fullname ilike '%" + fullname + "%'"
-    
-    if dni:
-        str_where += " AND dni ilike '%" + dni + "%'"
-        
-    str_count += str_where
-    str_query += str_where
-    
-    total = db.execute(str_count).scalar()
-    total_pages=total/per_page if (total % per_page == 0) else math.trunc(total / per_page) + 1
-    
-    str_query += " LIMIT " + str(per_page) + " OFFSET " + str(page*per_page-per_page)
-     
-    lst_data = db.execute(str_query)
-    data = []
-    for item in lst_data:
-        data.append({'id': item['id'], 'username' : item['username'], 'fullname': item['fullname'], 
-                     'dni': item['dni'], 'email': item['email'], 'phone': item['phone'], 'selected': False})
-    
-    return {"page": page, "per_page": per_page, "total": total, "total_pages": total_pages, "data": data}
-        
 def new(db: Session, user: UserCreate):   
     pass_check = password_check(user.password, 8, 15)   
     if not pass_check['success']:

@@ -5,8 +5,7 @@ from ...schemas.partner.partner import PartnerBase, PartnerShema
 from sqlalchemy.orm import Session
 from ...app import get_db
 from typing import List, Dict
-from ...services.partner.partners import get_all, new, get_one, delete, update, get_one_by_registration_number, get_by_name, \
-    get_by_dni, get_by_nit
+from ...services.partner.partners import get_all, new, get_one, delete, update, get_one_by_registration_number
 from starlette import status
 from ...auth_bearer import JWTBearer
 import uuid
@@ -18,12 +17,13 @@ partner_route = APIRouter(
 
 @partner_route.get("/partners", response_model=Dict, summary="Obtener lista de Clientes")
 def get_partners(
-    page: int = 0, 
-    per_page: int = 100, 
-    name: str = '',
+    page: int = 1, 
+    per_page: int = 6, 
+    criteria_key: str = "",
+    criteria_value: str = "",
     db: Session = Depends(get_db)
 ):
-    return get_all(page=page, per_page=per_page, db=db, name=name)
+    return get_all(page=page, per_page=per_page, criteria_key=criteria_key, criteria_value=criteria_value, db=db)
     
 @partner_route.get("/partners/{id}", response_model=PartnerShema, summary="Obtener un Cliente por su ID")
 def get_partner_by_id(id: str, db: Session = Depends(get_db)):
@@ -33,36 +33,6 @@ def get_partner_by_id(id: str, db: Session = Depends(get_db)):
                    summary="Obtener un Cliente por su numero de registro")
 def get_partner_by_registration_number(registration_number: str, db: Session = Depends(get_db)):
     return get_one_by_registration_number(registration_number=registration_number, db=db)
-
-@partner_route.get("/partners/name/{name}", response_model=List[PartnerShema], summary="Obtener lista de Clientes por similitud de nombre")
-def get_partners_by_name(
-    request: Request,
-    name: str = '',
-    skip: int = 0, 
-    limit: int = 100, 
-    db: Session = Depends(get_db)
-):
-    return get_by_name(name=name, request=request, skip=skip, limit=limit, db=db)
-
-@partner_route.get("/partners/dni/{dni}", response_model=List[PartnerShema], summary="Obtener lista de Clientes por similitud de dni")
-def get_partners_by_dni(
-    request: Request,
-    dni: str = '',
-    skip: int = 0, 
-    limit: int = 100, 
-    db: Session = Depends(get_db)
-):
-    return get_by_dni(dni=dni, request=request, skip=skip, limit=limit, db=db)
-
-@partner_route.get("/partners/nit/{nit}", response_model=List[PartnerShema], summary="Obtener lista de Clientes por similitud de nit")
-def get_partners_by_nit(
-    request: Request,
-    nit: str = '',
-    skip: int = 0, 
-    limit: int = 100, 
-    db: Session = Depends(get_db)
-):
-    return get_by_nit(nit=nit, request=request, skip=skip, limit=limit, db=db)
 
 @partner_route.post("/partners", response_model=PartnerShema, summary="Crear un Cliente")
 def create_partner(partner: PartnerBase, db: Session = Depends(get_db)):

@@ -3,7 +3,7 @@
 import uuid
 from sqlalchemy import Column
 from sqlalchemy.sql.sqltypes import String, Boolean
-from ..config.db import Base
+from ...config.db import Base
 
 def generate_uuid():
     return str(uuid.uuid4())

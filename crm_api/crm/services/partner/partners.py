@@ -11,7 +11,7 @@ from passlib.context import CryptContext
 from ...auth_bearer import decodeJWT
 from typing import List
 
-def get_all(page: int, per_page: int, db: Session, name=''):  
+def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db: Session):  
     
     str_query = "Select count(*) FROM partner.partners where is_active=True "
     if name:

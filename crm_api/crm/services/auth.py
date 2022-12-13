@@ -1,6 +1,6 @@
 # auth.py
 from fastapi import Request, HTTPException
-from crm.models.user import Users
+from crm_api.crm.models.users.user import Users
 from jwt import encode
 from crm.auth_bearer import decodeJWT
 from datetime import datetime, timedelta
@@ -8,7 +8,7 @@ from passlib.context import CryptContext
 # from fast_captcha import img_captcha
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
-from crm.schemas.user import UserLogin
+from crm_api.crm.schemas.users.user import UserLogin
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from crm.config.config import settings

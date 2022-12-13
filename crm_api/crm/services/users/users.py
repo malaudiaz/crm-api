@@ -1,8 +1,8 @@
 # users.py
 
 from fastapi import HTTPException
-from crm.models.user import Users
-from crm.schemas.user import UserCreate, UserBase
+from crm_api.crm.models.users.user import Users
+from crm_api.crm.schemas.users.user import UserCreate, UserBase
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from passlib.context import CryptContext

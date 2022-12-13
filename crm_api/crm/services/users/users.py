@@ -67,7 +67,7 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
     total = db.execute(str_count).scalar()
     total_pages=total/per_page if (total % per_page == 0) else math.trunc(total / per_page) + 1
     
-    str_query += " LIMIT " + str(per_page) + " OFFSET " + str(page*per_page-per_page)
+    str_query += " ORDER BY username LIMIT " + str(per_page) + " OFFSET " + str(page*per_page-per_page)
      
     lst_data = db.execute(str_query)
     data = []

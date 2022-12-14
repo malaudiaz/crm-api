@@ -1,7 +1,7 @@
 # auth.py
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from crm.schemas.user import UserLogin
+from crm_api.crm.schemas.users.user import UserLogin
 from crm.services.auth import auth 
 #, get_captcha, verify_captcha
 

@@ -1,5 +1,6 @@
 # contract.py
 
+import math
 from unicodedata import name
 from fastapi import HTTPException
 from ...models.contracts.contract import Contract
@@ -12,20 +13,46 @@ from typing import List
 
 from ...services.partner.partners import get_one as partner_get_one
 from ...services.partner.contact import get_one as contact_get_one
-    
-def get_all(totalCount: int, skip: int, limit: int, db: Session):  
-    
-    str_query = "Select count(*) FROM contract.contracts where is_active=True "
-        
-    totalCount = db.execute(str_query).scalar() if totalCount == 0 else totalCount
-    data = db.query(Contract).offset(skip).limit(limit).all()  
-    return {'totalCount': int(totalCount), 'lst_data': data}
 
+def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db: Session):  
+    
+    str_where = "WHERE cont.is_active=True "
+    str_inner = " INNER JOIN partner.partners pa ON pa.id = cont.id_partner INNER JOIN partner.contacts co ON co.id = cont.id_contact" 
+    str_count = "Select count(*) FROM contract.contracts cont"
+    str_query = "Select cont.id, number, pa.name as partner_name, co.name as contact_name, sign_by, sign_date, " \
+        "initial_aproved_import, real_aproved_import, real_import, " \
+        "is_supplement, contract_id, cont.created_date FROM contract.contracts cont "
+    
+    dict_query = {'number': " AND number ilike '%" + criteria_value + "%'",
+                  'nit': " AND nit = '" + criteria_value + "'",
+                  'registration_number': " AND registration_number = '" + criteria_value + "'",
+                  'dni': " AND dni ilike '%" + criteria_value + "%'"}
+    
+    str_count += str_inner
+    str_query += str_inner
+    
+    str_where = str_where + dict_query[criteria_key] if criteria_value else "" 
+     
+    str_count += str_where 
+    str_query += str_where
+    
+    total = db.execute(str_count).scalar()
+    total_pages=total/per_page if (total % per_page == 0) else math.trunc(total / per_page) + 1
+    
+    str_query += " ORDER BY number LIMIT " + str(per_page) + " OFFSET " + str(page*per_page-per_page)
+     
+    lst_data = db.execute(str_query)
+    data = []
+    for item in lst_data:
+        data.append({'id': item['id'], 'number' : item['number'], 'partner': item['partner_name'], 
+                     'contact': item['contact_name'], 'sign_by': item['sign_by'], 'sign_date': item['sign_date'], 
+                     'initial_aproved_import': item['initial_aproved_import'], 'real_aproved_import': item['real_aproved_import'],  
+                     'real_import': item['real_import'], 'selected': False})
+    
+    return {"page": page, "per_page": per_page, "total": total, "total_pages": total_pages, "data": data}
+    
 def get_one(contract_id: str, db: Session):  
     return db.query(Contract).filter(Contract.id == contract_id).first()
-
-def get_by_number(number: str, db: Session):  
-    return db.query(Contract).filter(Contract.number == number).first()
 
 def new(db: Session, contract: ContractBase):
     

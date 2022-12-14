@@ -1,13 +1,14 @@
 # users.py
 
 from fastapi import HTTPException
-from crm.models.user import Users
-from crm.schemas.user import UserCreate, UserShema
+from crm_api.crm.models.users.user import Users
+from crm_api.crm.schemas.users.user import UserCreate, UserBase
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from passlib.context import CryptContext
 from crm.auth_bearer import decodeJWT
 from typing import List
+import math
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -49,18 +50,41 @@ def password_check(passwd, min_len, max_len):
 
     return RespObj
 
-def get_all(request: List[UserShema], skip: int, limit: int, db: Session):  
-    data = db.query(Users).offset(skip).limit(limit).all()                  
-    return data
-        
-def new(db: Session, user: UserCreate):
+def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db: Session):  
+    
+    str_where = "WHERE is_active=True " 
+    str_count = "Select count(*) FROM enterprise.users "
+    str_query = "Select id, username, fullname, dni, email, job, phone FROM enterprise.users "
+    
+    dict_query = {'username': " AND username ilike '%" + criteria_value + "%'",
+                  'fullname': " AND fullname ilike '%" + criteria_value + "%'",
+                  'dni': " AND dni ilike '%" + criteria_value + "%'"}
+    
+    str_where = str_where + dict_query[criteria_key] if criteria_value else ""  
+    str_count += str_where 
+    str_query += str_where
+    
+    total = db.execute(str_count).scalar()
+    total_pages=total/per_page if (total % per_page == 0) else math.trunc(total / per_page) + 1
+    
+    str_query += " ORDER BY username LIMIT " + str(per_page) + " OFFSET " + str(page*per_page-per_page)
+     
+    lst_data = db.execute(str_query)
+    data = []
+    for item in lst_data:
+        data.append({'id': item['id'], 'username' : item['username'], 'fullname': item['fullname'], 
+                     'dni': item['dni'], 'email': item['email'], 'job': item['job'], 'phone': item['phone'], 'selected': False})
+    
+    return {"page": page, "per_page": per_page, "total": total, "total_pages": total_pages, "data": data}
+
+def new(db: Session, user: UserCreate):   
     pass_check = password_check(user.password, 8, 15)   
     if not pass_check['success']:
         raise HTTPException(status_code=404, detail="Error en los datos, " + pass_check['message'])             
     
     user.password = pwd_context.hash(user.password)  
-    db_user = Users(username=user.username, fullname=user.fullname, dni=user.dni, email=user.email, phone=user.phone, password=user.password)
-    
+    db_user = Users(username=user.username, fullname=user.fullname, dni=user.dni, job=user.job, email=user.email, phone=user.phone, password=user.password, selected=False)
+        
     try:
         db.add(db_user)
         db.commit()
@@ -91,12 +115,13 @@ def delete(user_id: str, db: Session):
         print(e)
         raise HTTPException(status_code=404, detail="No es posible eliminar")
     
-def update(user_id: str, user: UserCreate, db: Session):
+def update(user_id: str, user: UserBase, db: Session):
        
     db_user = db.query(Users).filter(Users.id == user_id).first()
     db_user.username = user.username
     db_user.fullname = user.fullname
     db_user.dni = user.dni
+    db_user.job = user.job
     db_user.email = user.email
     db_user.phone = user.phone
 

@@ -1,6 +1,6 @@
 # auth.py
 from fastapi import Request, HTTPException
-from crm.models.user import Users
+from crm_api.crm.models.users.user import Users
 from jwt import encode
 from crm.auth_bearer import decodeJWT
 from datetime import datetime, timedelta
@@ -8,7 +8,7 @@ from passlib.context import CryptContext
 # from fast_captcha import img_captcha
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
-from crm.schemas.user import UserLogin
+from crm_api.crm.schemas.users.user import UserLogin
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from crm.config.config import settings
@@ -45,11 +45,11 @@ def auth(db: Session, user: UserLogin):
     
     if pwd_context.verify(user.password, data.password):
         db_user = db.query(Users).where(Users.username == user.username).first()  
-        
+                
         token_data = {"username": data.username, "user_id": data.id}
 
-        return JSONResponse(content={"token": write_token(data=token_data), "token_type": "Bearer"}, status_code=200)
+        return JSONResponse(content={"token": write_token(data=token_data), "token_type": "Bearer", "fullname": db_user.fullname, "job": db_user.job, "user_id": db_user.id}, status_code=200)
 
         # raise HTTPException(status_code=200, detail={"token": write_token(data=token_data), "token_type": "Bearer"})
     else:
-        raise HTTPException(status_code=404, detail="Contraseña incorrecta")
+        raise HTTPException(status_code=405, detail="Contraseña incorrecta")

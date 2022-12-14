@@ -5,7 +5,7 @@ from ...schemas.partner.contact import ContactBase, ContactShema, PartnerContact
 from sqlalchemy.orm import Session
 from ...app import get_db
 from typing import List, Dict
-from ...services.partner.contact import get_all, new, get_one, delete, update, get_by_name, get_by_dni, \
+from ...services.partner.contact import get_all, new, get_one, delete, update, \
     asociate_partner_contact, desasociate_partner_contact
 from starlette import status
 from ...auth_bearer import JWTBearer
@@ -18,37 +18,17 @@ contact_route = APIRouter(
 
 @contact_route.get("/contacts", response_model=Dict, summary="Obtener lista de Contactos")
 def get_contacts(
-    totalCount: int = 0,
-    skip: int = 0, 
-    limit: int = 100, 
-    name: str = '',
+    page: int = 1, 
+    per_page: int = 6, 
+    criteria_key: str = "",
+    criteria_value: str = "",
     db: Session = Depends(get_db)
 ):
-    return get_all(totalCount=totalCount, skip=skip, limit=limit, db=db, name=name)
+    return get_all(page=page, per_page=per_page, criteria_key=criteria_key, criteria_value=criteria_value, db=db)
 
 @contact_route.get("/contacts/{id}", response_model=ContactShema, summary="Obtener un Contacto por su ID")
 def get_contact_by_id(id: str, db: Session = Depends(get_db)):
     return get_one(contact_id=id, db=db)
-
-@contact_route.get("/contacts/name/{name}", response_model=List[ContactShema], summary="Obtener lista de Contactos por similitud de nombre")
-def get_contacts_by_name(
-    request: Request,
-    name: str = '',
-    skip: int = 0, 
-    limit: int = 100, 
-    db: Session = Depends(get_db)
-):
-    return get_by_name(name=name, request=request, skip=skip, limit=limit, db=db)
-
-@contact_route.get("/contacts/dni/{dni}", response_model=List[ContactShema], summary="Obtener lista de Contactos por similitud de dni")
-def get_contact_by_dni(
-    request: Request,
-    dni: str = '',
-    skip: int = 0, 
-    limit: int = 100, 
-    db: Session = Depends(get_db)
-):
-    return get_by_dni(dni=dni, request=request, skip=skip, limit=limit, db=db)
 
 @contact_route.post("/contacts", response_model=ContactShema, summary="Crear un Contacto")
 def create_contact(contact: ContactBase, db: Session = Depends(get_db)):

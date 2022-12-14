@@ -7,6 +7,7 @@ class UserBase(BaseModel):
     username: str
     fullname: str
     dni: str
+    job: str
     email: str
     phone: str
 
@@ -20,6 +21,7 @@ class UserCreate(UserBase):
 class UserShema(UserCreate):
     id: UUID
     is_active: bool
+    selected: bool = False
  
     class Config:
         orm_mode = True

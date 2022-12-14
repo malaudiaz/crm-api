@@ -60,3 +60,5 @@ poetry shell
 poetry add fastapi uvicorn alembic psycopg2-binary itsdangerous passlib fastapi-sqlalchemy python-dotenv PyJWT
 
 poetry run python crm_api/main.py 
+
+-------

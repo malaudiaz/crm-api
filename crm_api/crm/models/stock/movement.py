@@ -9,7 +9,7 @@ from ...config.db import Base
 from sqlalchemy.orm import relationship
 from ...models.stock.location import Location
 from ...models.resources.status import StatusElement
-# from ...models.stock.product import Product
+from ...models.stock.measure import Measure
 
 def generate_uuid():
     return str(uuid.uuid4())
@@ -26,7 +26,7 @@ class Movement(Base):
     status_id = Column(Integer, ForeignKey("resources.status_element.id"), nullable=False)
     source = Column(String, ForeignKey("stock.location.id"), nullable=False)
     destiny = Column(String, ForeignKey("stock.location.id"), nullable=False)
-    measurement = Column(String, nullable=True)
+    measure_id = Column(Integer, ForeignKey("stock.measure.id"), nullable=False)
     document_number = Column(String(100), nullable=True)
     created_by = Column(String(50), nullable=False)
     created_date = Column(DateTime, nullable=False, default=datetime.now())
@@ -36,6 +36,7 @@ class Movement(Base):
     location_source = relationship("Location", foreign_keys=[source])
     location_destiny = relationship("Location", foreign_keys=[destiny])
     status = relationship("StatusElement")
+    measure = relationship("Measure")
     product = relationship("Product", back_populates="movements")
 
     def dict(self):
@@ -46,7 +47,7 @@ class Movement(Base):
             "status_id": self.status_id,
             "source": self.source,
             "destiny": self.destiny,
-            "measurement": self.measurement,
+            "measure_id": self.measure_id,
             "document_number": self.document_number,
             "created_by": self.created_by,
             "created_date": self.created_date,
@@ -55,6 +56,7 @@ class Movement(Base):
             "location_source": self.location_source,
             "location_destiny": self.location_destiny,
             "status": self.status,
+            "measure": self.measure,
             # "status_name": self.status.name,
             "product": self.product,
             "product_name": self.product.name,

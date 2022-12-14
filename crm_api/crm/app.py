@@ -44,6 +44,7 @@ from crm.routes.stock.warehouse import warehouse_route
 from crm.routes.stock.location import location_route
 from crm.routes.stock.movement import movement_route
 from crm.routes.stock.product import product_route
+from crm.routes.stock.measure import measure_route
 from crm.routes.contracts.contract import contract_route
 
 @app.get("/docs", include_in_schema=False)
@@ -82,4 +83,5 @@ app.include_router(warehouse_route, prefix="/api/stock/warehouse")
 app.include_router(location_route, prefix="/api/stock/location")
 app.include_router(movement_route, prefix="/api/stock/movement")
 app.include_router(product_route, prefix="/api/stock/product")
+app.include_router(measure_route, prefix="/api/stock/measure")
 app.include_router(contract_route, prefix="/api")

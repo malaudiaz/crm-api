@@ -10,7 +10,7 @@ class ContactBase(BaseModel):
     name: str
     address: Optional[str]
     dni: Optional[str]
-    email: Optional[EmailStr]
+    email: Optional[str]
     phone: Optional[str]
     mobile: Optional[str]
     job: Optional[str]

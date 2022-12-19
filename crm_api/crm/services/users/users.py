@@ -49,7 +49,7 @@ def password_check(passwd, min_len, max_len):
 
     return RespObj
 
-def get_all(request, page: int, per_page: int, criteria_key: str, criteria_value: str, db: Session):    
+def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db: Session):    
      
     str_where = "WHERE is_active=True " 
     str_count = "Select count(*) FROM enterprise.users "

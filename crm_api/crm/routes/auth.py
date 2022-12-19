@@ -10,8 +10,9 @@ from crm.app import get_db
 from starlette import status
 from crm.auth_bearer import JWTBearer
 from fastapi.responses import JSONResponse
-from crm.auth_bearer import decodeJWT
 from crm.functions_jwt import get_current_user
+
+from crm.config.config import settings
 
 auth_routes = APIRouter()
 

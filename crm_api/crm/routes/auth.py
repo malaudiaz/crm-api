@@ -1,13 +1,17 @@
 # auth.py
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, Request, Header
 from crm_api.crm.schemas.users.user import UserLogin
-from crm.services.auth import auth 
+from crm.services.auth import auth
 #, get_captcha, verify_captcha
 
 from sqlalchemy.orm import Session
 from crm.app import get_db
 from starlette import status
+from crm.auth_bearer import JWTBearer
+from fastapi.responses import JSONResponse
+from crm.auth_bearer import decodeJWT
+from crm.functions_jwt import get_current_user
 
 auth_routes = APIRouter()
 
@@ -27,3 +31,7 @@ auth_routes = APIRouter()
 def login(user: UserLogin, db: Session = Depends(get_db)):
     return auth(db=db, user=user)
 
+@auth_routes.get('/me', summary='Get details of currently logged in user', dependencies=[Depends(JWTBearer())])
+async def get_me(request:Request):
+    user = get_current_user(request)       
+    return JSONResponse(content=user, status_code=200)

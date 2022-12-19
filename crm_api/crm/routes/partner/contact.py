@@ -1,6 +1,6 @@
 # Routes contact.py
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException
 from ...schemas.partner.contact import ContactBase, ContactShema, PartnerContactBase, PartnerContactRelation
 from sqlalchemy.orm import Session
 from ...app import get_db
@@ -10,10 +10,11 @@ from ...services.partner.contact import get_all, new, get_one, delete, update, \
 from starlette import status
 from ...auth_bearer import JWTBearer
 import uuid
+
   
 contact_route = APIRouter(
     tags=["Contactos"],
-    #dependencies=[Depends(JWTBearer())]   
+    dependencies=[Depends(JWTBearer())]   
 )
 
 @contact_route.get("/contacts", response_model=Dict, summary="Obtener lista de Contactos")

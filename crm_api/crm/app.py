@@ -1,7 +1,6 @@
 # app.py
 
-from sys import prefix
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from crm.config.config import settings
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware

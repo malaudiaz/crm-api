@@ -23,7 +23,7 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
                   'registration_number': " AND registration_number = '" + criteria_value + "'",
                   'dni': " AND dni ilike '%" + criteria_value + "%'"}
     
-    str_where = str_where + dict_query[criteria_key] if criteria_value else ""  
+    str_where = str_where + dict_query[criteria_key] if criteria_value else str_where  
     str_count += str_where 
     str_query += str_where
     
@@ -38,7 +38,7 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
         data.append({'id': item['id'], 'name' : item['name'], 'address': item['address'], 
                      'dni': item['dni'], 'email': item['email'], 'phone': item['phone'], 
                      'mobile': item['mobile'], 'nit': item['nit'], 'is_provider': item['is_provider'], 
-                     'created_by': item['created_by'], 'nit': item['nit'], 'registration_number': item['registration_number'], 
+                     'created_by': item['created_by'], 'nit': item['nit'], 'registration_number': item['registration_number'], 'type': item['type'],
                      'registration_user': item['registration_user'], 'registration_date': item['registration_date'],  
                      'selected': False})
     

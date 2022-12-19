@@ -33,6 +33,7 @@ class JWTBearer(HTTPBearer):
         isTokenValid: bool = False
         try:
             payload = decodeJWT(jwtoken)
+            print(payload);
         except:
             payload = None
 

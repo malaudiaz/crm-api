@@ -25,7 +25,7 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
                   'mobile': " AND mobile = '" + criteria_value + "'",
                   'dni': " AND dni ilike '%" + criteria_value + "%'"}
     
-    str_where = str_where + dict_query[criteria_key] if criteria_value else ""  
+    str_where = str_where + dict_query[criteria_key] if criteria_value else str_where 
     str_count += str_where 
     str_query += str_where
     
@@ -34,6 +34,8 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
     
     str_query += " ORDER BY name LIMIT " + str(per_page) + " OFFSET " + str(page*per_page-per_page)
      
+    print(str_query)
+    
     lst_data = db.execute(str_query)
     data = []
     for item in lst_data:

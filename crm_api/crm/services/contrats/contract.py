@@ -16,7 +16,7 @@ from ...services.partner.contact import get_one as contact_get_one
 
 def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db: Session):  
     
-    str_where = "WHERE cont.is_active=True "
+    str_where = " WHERE cont.is_active=True "
     str_inner = " INNER JOIN partner.partners pa ON pa.id = cont.id_partner INNER JOIN partner.contacts co ON co.id = cont.id_contact" 
     str_count = "Select count(*) FROM contract.contracts cont"
     str_query = "Select cont.id, number, pa.name as partner_name, co.name as contact_name, sign_by, sign_date, " \
@@ -31,7 +31,7 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
     str_count += str_inner
     str_query += str_inner
     
-    str_where = str_where + dict_query[criteria_key] if criteria_value else "" 
+    str_where = str_where + dict_query[criteria_key] if criteria_value else str_where 
      
     str_count += str_where 
     str_query += str_where

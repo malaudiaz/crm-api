@@ -10,4 +10,5 @@ from ..models.stock.warehouse import *
 from ..models.stock.location import *
 from ..models.stock.movement import *
 from ..models.stock.product import *
+from ..models.stock.measure import *
 from ..models.contracts.contract import *

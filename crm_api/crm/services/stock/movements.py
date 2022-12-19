@@ -23,7 +23,7 @@ def get_all(request: List[MovementShema], skip: int, limit: int, db: Session):
         
 def new(db: Session, movement: MovementBase):
     
-    db_movement = Movement(quantity=movement.quantity, measurement=movement.measurement, 
+    db_movement = Movement(quantity=movement.quantity, measure_id=movement.measure_id, 
                            document_number=movement.document_number, status_id=movement.status_id,
                            source=movement.source, destiny=movement.destiny, product_id=movement.product_id,
                            created_by='foo', updated_by='foo', )
@@ -73,8 +73,8 @@ def update(movement_id: str, movement: MovementBase, db: Session):
         db_movement.quantity=movement.quantity
     if movement.document_number:
         db_movement.document_number=movement.document_number
-    if movement.measurement:
-        db_movement.measurement = movement.measurement
+    if movement.measure_id:
+        db_movement.measure_id = movement.measure_id
     
     if movement.source:
         db_movement.source = movement.source

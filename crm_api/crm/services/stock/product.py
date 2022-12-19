@@ -3,7 +3,7 @@
 from unicodedata import name
 from fastapi import HTTPException
 from ...models.stock.product import Product
-from ...schemas.stock.product import ProductBase, ProductSchema, MovementProductShema
+from ...schemas.stock.product import ProductBase, ProductSchema
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from passlib.context import CryptContext
@@ -20,7 +20,7 @@ def get_all(request: List[ProductSchema], skip: int, limit: int, db: Session):
 def new(db: Session, product: ProductBase):
     
     db_product = Product(code=product.code, name=product.name, description=product.description, 
-                         measurement=product.measurement, unit_price=product.unit_price, 
+                         measure_id=product.measure_id, unit_price=product.unit_price, 
                          cost_price=product.cost_price, sale_price=product.sale_price, 
                          ledger_account=product.ledger_account,
                          created_by='foo', updated_by='foo')
@@ -60,8 +60,8 @@ def update(product_id: str, product: ProductBase, db: Session):
         db_product.name=product.name
     if product.description:
         db_product.description=product.description
-    if product.measurement:
-        db_product.measurement = product.measurement
+    if product.measure_id:
+        db_product.measure_id = product.measure_id
     if product.unit_price:
         db_product.unit_price = product.unit_price
     if product.cost_price:
@@ -70,8 +70,6 @@ def update(product_id: str, product: ProductBase, db: Session):
         db_product.sale_price = product.sale_price
     if product.ledger_account:
         db_product.ledger_account = product.ledger_account
-    
-    # db_product.is_active = product.is_active
     
     try:
         db.add(db_product)

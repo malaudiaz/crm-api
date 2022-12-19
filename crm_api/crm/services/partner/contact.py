@@ -17,7 +17,7 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
     
     str_where = "WHERE is_active=True " 
     str_count = "Select count(*) FROM partner.contacts "
-    str_query = "Select id, name, address, dni, email, phone, mobile, created_by, created_date, " \
+    str_query = "Select id, name, job, address, dni, email, phone, mobile, created_by, created_date, " \
         "updated_by, updated_date FROM partner.contacts "
     
     dict_query = {'name': " AND name ilike '%" + criteria_value + "%'",
@@ -41,7 +41,7 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
     for item in lst_data:
         data.append({'id': item['id'], 'name' : item['name'], 'address': item['address'], 
                      'dni': item['dni'], 'email': item['email'], 'phone': item['phone'], 
-                     'mobile': item['mobile'], 'selected': False})
+                     'mobile': item['mobile'], 'job': item['job'], 'selected': False})
     
     return {"page": page, "per_page": per_page, "total": total, "total_pages": total_pages, "data": data}
     
@@ -50,7 +50,7 @@ def get_one(contact_id: str, db: Session):
 
 def new(db: Session, contact: ContactBase):
     
-    db_contact = Contact(name=contact.name, address=contact.address, dni=contact.dni, 
+    db_contact = Contact(name=contact.name, job=contact.job, address=contact.address, dni=contact.dni, 
                          email=contact.email, phone=contact.phone, mobile=contact.mobile, 
                          created_by='foo', updated_by='foo')
   
@@ -80,6 +80,7 @@ def update(contact_id: str, contact: ContactBase, db: Session):
     db_contact = db.query(Contact).filter(Contact.id == contact_id).first()
     db_contact.updated_by = 'foo'
     db_contact.name=contact.name
+    db_contact.job= contact.job
     db_contact.address=contact.address
     db_contact.dni=contact.dni
     db_contact.email=contact.email

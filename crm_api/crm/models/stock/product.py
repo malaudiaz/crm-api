@@ -7,6 +7,7 @@ from sqlalchemy import Column, Float, ForeignKey, Integer
 from sqlalchemy.sql.sqltypes import String, Boolean, DateTime
 from ...config.db import Base
 from ...models.stock.movement import Movement
+from ...models.stock.measure import Measure
 from sqlalchemy.orm import relationship
 
 def generate_uuid():
@@ -23,7 +24,7 @@ class Product(Base):
     name = Column(String(250), nullable=False)
     description = Column(String(200), nullable=False)
     is_active = Column(Boolean, nullable=False, default=True)
-    measurement = Column(String, nullable=False)
+    measure_id = Column(Integer, ForeignKey("stock.measure.id"), nullable=False)
     unit_price = Column(Float, nullable=False)
     cost_price = Column(Float, nullable=True)
     sale_price = Column(Float, nullable=True)
@@ -34,6 +35,7 @@ class Product(Base):
     updated_date = Column(DateTime, nullable=False, default=datetime.now())
         
     movements = relationship("Movement")
+    measure = relationship("Measure")
 
     def dict(self):
         return {
@@ -42,7 +44,7 @@ class Product(Base):
             "name": self.name,
             "description": self.description,
             "is_active": self.is_active,
-            "measurement": self.measurement,
+            "measure_id": self.measure_id,
             "unit_price": self.unit_price,
             "cost_price": self.cost_price,
             "sale_price": self.sale_price,
@@ -51,5 +53,6 @@ class Product(Base):
             "created_date": self.created_date,
             "updated_by": self.updated_by,
             "updated_date": self.updated_date,
-            "movements": self.movements
+            "movements": self.movements,
+            "measure": self.measure
         }

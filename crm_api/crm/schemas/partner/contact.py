@@ -13,6 +13,7 @@ class ContactBase(BaseModel):
     email: Optional[EmailStr]
     phone: Optional[str]
     mobile: Optional[str]
+    job: Optional[str]
     
     @validator('name')
     def name_not_empty(cls, name):

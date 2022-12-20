@@ -12,7 +12,7 @@ import uuid
   
 partner_route = APIRouter(
     tags=["Clientes"],
-    #dependencies=[Depends(JWTBearer())]   
+    dependencies=[Depends(JWTBearer())]
 )
 
 @partner_route.get("/partners", response_model=Dict, summary="Obtener lista de Clientes")

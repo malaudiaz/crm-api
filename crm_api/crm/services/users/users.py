@@ -50,7 +50,7 @@ def password_check(passwd, min_len, max_len):
     return RespObj
 
 def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db: Session):    
-     
+      
     str_where = "WHERE is_active=True " 
     str_count = "Select count(*) FROM enterprise.users "
     str_query = "Select id, username, fullname, dni, email, job, phone FROM enterprise.users "
@@ -76,12 +76,10 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
     
     return {"page": page, "per_page": per_page, "total": total, "total_pages": total_pages, "data": data}
 
-def new(request, db: Session, user: UserCreate):   
-    
-    user = get_current_user(request)  
-    
-    print(user)
-
+def new(request, db: Session, user: UserCreate):  
+    # Para obtener el usuario logueado descomentar estas dos líneas. 
+    # currentUser = get_current_user(request)      
+    # print(currentUser)
 
     pass_check = password_check(user.password, 8, 15)   
     if not pass_check['success']:

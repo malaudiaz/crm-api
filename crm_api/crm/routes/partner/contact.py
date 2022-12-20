@@ -14,7 +14,7 @@ import uuid
   
 contact_route = APIRouter(
     tags=["Contactos"],
-    dependencies=[Depends(JWTBearer())]   
+    # dependencies=[Depends(JWTBearer())]   
 )
 
 @contact_route.get("/contacts", response_model=Dict, summary="Obtener lista de Contactos")

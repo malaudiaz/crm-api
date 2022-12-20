@@ -9,7 +9,7 @@ def expire_date(minutes: int):
     return expire
 
 def write_token(data: dict):
-    token = encode(payload={**data, "exp": expire_date(minutes=30)}, key=settings.secret, algorithm=settings.algorithm)
+    token = encode(payload={**data, "exp": expire_date(minutes=1440)}, key=settings.secret, algorithm=settings.algorithm)
     return token
   
 def validate_token(token, output=False):

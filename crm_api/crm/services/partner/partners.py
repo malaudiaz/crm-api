@@ -4,6 +4,7 @@ import math
 from unicodedata import name
 from fastapi import HTTPException
 from ...models.partner.partner import Partner
+from ...models.partner.contacto import PartnerContact
 from ...schemas.partner.partner import PartnerBase, PartnerShema
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
@@ -58,9 +59,19 @@ def new(db: Session, partner: PartnerBase):
                          registration_date=partner.registration_date, created_by='foo', updated_by='foo')
   
     try:
+        
         db.add(db_partner)
+        
         db.commit()
         db.refresh(db_partner)
+        
+        if partner.contacts:
+            for item_co in partner.contacts:
+                pa_contact = PartnerContact(id_partner=db_partner.id, id_contact=item_co['id'], id_relationtype=None,
+                                            created_by='foo', updated_by='foo')
+                db.add(pa_contact)
+                db.commit()
+                
         return db_partner
     except (Exception, SQLAlchemyError, IntegrityError) as e:
         print(e)

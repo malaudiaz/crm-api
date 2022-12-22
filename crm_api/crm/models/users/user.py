@@ -24,6 +24,7 @@ class Users(Base):
     password = Column(String(255), nullable=False)
     is_active = Column(Boolean, nullable=False, default=True)
     selected = Column(Boolean, nullable=False, default=False)
+    sign_contracts = Column(Boolean, nullable=True, default=False)
     
     # skeleton_id = Column(String, ForeignKey("enterprise.skeleton.id"), comment="Departamento del Usuario")   # FK added    
         
@@ -38,7 +39,8 @@ class Users(Base):
             "phone": self.phone,
             "password": self.password,
             "is_active": self.is_active,
-            "selected": self.selected
+            "selected": self.selected,
+            sign_contracts: self.sign_contracts
         }
     
 # Base.metadata.create_all(bind=engine)

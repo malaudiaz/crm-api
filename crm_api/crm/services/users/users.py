@@ -6,8 +6,7 @@ from crm.schemas.users.user import UserCreate, UserBase
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from passlib.context import CryptContext
-from crm.auth_bearer import decodeJWT
-from typing import List
+from crm.functions_jwt import get_current_user
 import math
 
 
@@ -50,8 +49,8 @@ def password_check(passwd, min_len, max_len):
 
     return RespObj
 
-def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db: Session):  
-    
+def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db: Session):    
+      
     str_where = "WHERE is_active=True " 
     str_count = "Select count(*) FROM enterprise.users "
     str_query = "Select id, username, fullname, dni, email, job, phone FROM enterprise.users "
@@ -77,7 +76,11 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
     
     return {"page": page, "per_page": per_page, "total": total, "total_pages": total_pages, "data": data}
 
-def new(db: Session, user: UserCreate):   
+def new(request, db: Session, user: UserCreate):  
+    # Para obtener el usuario logueado descomentar estas dos líneas. 
+    # currentUser = get_current_user(request)      
+    # print(currentUser)
+
     pass_check = password_check(user.password, 8, 15)   
     if not pass_check['success']:
         raise HTTPException(status_code=404, detail="Error en los datos, " + pass_check['message'])             

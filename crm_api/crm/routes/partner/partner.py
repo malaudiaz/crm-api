@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from ...schemas.partner.partner import PartnerBase, PartnerShema
 from sqlalchemy.orm import Session
 from ...app import get_db
-from typing import List, Dict
+from typing import List, Dict, Any
 from ...services.partner.partners import get_all, new, get_one, delete, update, get_one_by_registration_number
 from starlette import status
 from ...auth_bearer import JWTBearer
@@ -12,7 +12,7 @@ import uuid
   
 partner_route = APIRouter(
     tags=["Clientes"],
-    #dependencies=[Depends(JWTBearer())]   
+    dependencies=[Depends(JWTBearer())]
 )
 
 @partner_route.get("/partners", response_model=Dict, summary="Obtener lista de Clientes")
@@ -35,8 +35,15 @@ def get_partner_by_registration_number(registration_number: str, db: Session = D
     return get_one_by_registration_number(registration_number=registration_number, db=db)
 
 @partner_route.post("/partners", response_model=PartnerShema, summary="Crear un Cliente")
+# @partner_route.post("/partners", summary="Crear un Cliente")
 def create_partner(partner: PartnerBase, db: Session = Depends(get_db)):
     return new(partner=partner, db=db)
+
+# @partner_route.post("/partners", summary="Crear un Cliente")
+# def create_partner(partner: Dict[Any, Any], db: Session = Depends(get_db)):
+#     print(partner)
+#     return True
+#     return new(partner=partner, db=db)
 
 @partner_route.delete("/partners/{id}", status_code=status.HTTP_200_OK, summary="Desactivar un Cliente por su ID")
 def delete_partner(id: uuid.UUID, db: Session = Depends(get_db)):

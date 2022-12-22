@@ -14,7 +14,7 @@ from typing import List
 from ...services.partner.partners import get_one as partner_get_one
 
 def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db: Session):  
-    
+        
     str_where = "WHERE is_active=True " 
     str_count = "Select count(*) FROM partner.contacts "
     str_query = "Select id, name, job, address, dni, email, phone, mobile, created_by, created_date, " \

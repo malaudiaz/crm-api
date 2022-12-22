@@ -12,7 +12,7 @@ import uuid
   
 user_route = APIRouter(
     tags=["Usuarios"],
-    # dependencies=[Depends(JWTBearer())]   
+    dependencies=[Depends(JWTBearer())]   
 )
 
 @user_route.get("/users", response_model=Dict, summary="Obtener lista de Usuarios")
@@ -26,8 +26,8 @@ def get_users(
     return get_all(page=page, per_page=per_page, criteria_key=criteria_key, criteria_value=criteria_value, db=db)
 
 @user_route.post("/users", response_model=UserShema, summary="Crear un Usuario")
-def create_user(user: UserCreate, db: Session = Depends(get_db)):
-    return new(user=user, db=db)
+def create_user(request:Request, user: UserCreate, db: Session = Depends(get_db)):    
+    return new(request=request, user=user, db=db)
 
 @user_route.get("/users/{id}", response_model=UserShema, summary="Obtener un Usuario por su ID")
 def get_user_by_id(id: str, db: Session = Depends(get_db)):

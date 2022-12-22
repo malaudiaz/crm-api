@@ -15,9 +15,12 @@ class PartnerBase(BaseModel):
     phone: Optional[str]
     mobile: Optional[str]
     nit: Optional[str]
-    registration_number: int
+    registration_number: Optional[int]
     registration_user: Optional[str]
     registration_date: Optional[date] = None
+    
+    contacts: dict = {}
+    contacts: list = []
     
     @validator('type')
     def partner_type(cls, type):

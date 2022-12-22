@@ -1,11 +1,11 @@
 # Routes user.py
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from crm_api.crm.schemas.users.user import UserShema, UserCreate, UserBase
+from crm.schemas.users.user import UserShema, UserCreate, UserBase
 from sqlalchemy.orm import Session
 from crm.app import get_db
 from typing import List, Dict
-from crm_api.crm.services.users.users import get_all, new, get_one, delete, update
+from crm.services.users.users import get_all, new, get_one, delete, update
 from starlette import status
 from crm.auth_bearer import JWTBearer
 import uuid

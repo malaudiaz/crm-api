@@ -32,7 +32,7 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 app.add_middleware(SessionMiddleware, secret_key=settings.secret)
 
 from crm.routes.auth import auth_routes
-from crm_api.crm.routes.users.user import user_route
+from crm.routes.users.user import user_route
 from crm.routes.options import options_route
 from crm.routes.invoices.invoice import invoice_route
 from crm.routes.resources.status import status_route

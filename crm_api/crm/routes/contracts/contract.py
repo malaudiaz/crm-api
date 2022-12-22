@@ -10,7 +10,7 @@ import uuid
   
 contract_route = APIRouter(
     tags=["Contratos"],
-    #dependencies=[Depends(JWTBearer())]   
+    dependencies=[Depends(JWTBearer())]   
 )
 
 @contract_route.get("/contracts", response_model=Dict, summary="Obtener lista de Contratos")

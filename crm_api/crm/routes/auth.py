@@ -1,8 +1,10 @@
 # auth.py
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from crm_api.crm.schemas.users.user import UserLogin
-from crm.services.auth import auth 
+# from crm_api.crm.schemas.users.user import UserLogin
+from ..schemas.users.user import UserLogin
+# from services.auth import auth 
+from ..services.auth import auth
 #, get_captcha, verify_captcha
 
 from sqlalchemy.orm import Session

@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from ...app import get_db
 from typing import List, Dict
 from ...services.partner.contact import get_all, new, get_one, delete, update, \
-    asociate_partner_contact, desasociate_partner_contact
+    asociate_partner_contact, desasociate_partner_contact, get_contacts_by_partner
 from starlette import status
 from ...auth_bearer import JWTBearer
 import uuid
@@ -30,6 +30,15 @@ def get_contacts(
 @contact_route.get("/contacts/{id}", response_model=ContactShema, summary="Obtener un Contacto por su ID")
 def get_contact_by_id(id: str, db: Session = Depends(get_db)):
     return get_one(contact_id=id, db=db)
+
+@contact_route.get("/contacts/partner/{partner_id}", response_model=Dict, summary="Obtener listado de Contactos de un Cliente")
+def get_contacts(
+    page: int = 1, 
+    per_page: int = 6, 
+    partner_id: str = "", 
+    db: Session = Depends(get_db)
+):
+    return get_contacts_by_partner(page=page, per_page=per_page, partner_id=partner_id, db=db)
 
 @contact_route.post("/contacts", response_model=ContactShema, summary="Crear un Contacto")
 def create_contact(contact: ContactBase, db: Session = Depends(get_db)):

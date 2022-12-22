@@ -6,9 +6,11 @@ from fastapi import HTTPException
 from ...models.partner.partner import Partner
 from ...models.partner.contacto import PartnerContact
 from ...schemas.partner.partner import PartnerBase, PartnerShema
+from ...services.partner.contact import asociate_partner_contact_with_object
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from passlib.context import CryptContext
+from crm.functions_jwt import get_current_user
 from ...auth_bearer import decodeJWT
 from typing import List
 
@@ -51,28 +53,28 @@ def get_one(partner_id: str, db: Session):
 def get_one_by_registration_number(registration_number: str, db: Session):  
     return db.query(Partner).filter(Partner.registration_number == registration_number).first()
 
-def new(db: Session, partner: PartnerBase):
+def new(request, db: Session, partner: PartnerBase):
+    
+    currentUser = get_current_user(request) 
     
     db_partner = Partner(type=partner.type, name=partner.name, address=partner.address, dni=partner.dni, 
                          email=partner.email, phone=partner.phone, mobile=partner.mobile, nit=partner.nit,
                          registration_number=partner.registration_number, registration_user=partner.registration_user,
-                         registration_date=partner.registration_date, created_by='foo', updated_by='foo')
+                         registration_date=partner.registration_date, created_by=currentUser['username'], updated_by=currentUser['username'])
   
     try:
         
         db.add(db_partner)
-        
         db.commit()
         db.refresh(db_partner)
         
         if partner.contacts:
             for item_co in partner.contacts:
-                pa_contact = PartnerContact(id_partner=db_partner.id, id_contact=item_co['id'], id_relationtype=None,
-                                            created_by='foo', updated_by='foo')
-                db.add(pa_contact)
-                db.commit()
+                # puede existir o no el contacto...
+                asociate_partner_contact_with_object(
+                    partner_id=db_partner.id, contact=item_co, user_name=currentUser['username'], db=db)
                 
-        return db_partner
+        return True
     except (Exception, SQLAlchemyError, IntegrityError) as e:
         print(e)
         msg = 'Ha ocurrido un error al crear el cliente'               

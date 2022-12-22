@@ -34,10 +34,10 @@ def get_partner_by_id(id: str, db: Session = Depends(get_db)):
 def get_partner_by_registration_number(registration_number: str, db: Session = Depends(get_db)):
     return get_one_by_registration_number(registration_number=registration_number, db=db)
 
-@partner_route.post("/partners", response_model=PartnerShema, summary="Crear un Cliente")
-# @partner_route.post("/partners", summary="Crear un Cliente")
-def create_partner(partner: PartnerBase, db: Session = Depends(get_db)):
-    return new(partner=partner, db=db)
+# @partner_route.post("/partners", response_model=PartnerShema, summary="Crear un Cliente")
+@partner_route.post("/partners", summary="Crear un Cliente")
+def create_partner(request:Request, partner: PartnerBase, db: Session = Depends(get_db)):
+    return new(request=request, partner=partner, db=db)
 
 # @partner_route.post("/partners", summary="Crear un Cliente")
 # def create_partner(partner: Dict[Any, Any], db: Session = Depends(get_db)):

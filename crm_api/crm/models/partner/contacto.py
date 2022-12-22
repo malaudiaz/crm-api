@@ -30,7 +30,7 @@ class Contact(Base):
     created_date = Column(DateTime, nullable=False, default=datetime.now())
     updated_by = Column(String(50), nullable=False)
     updated_date = Column(DateTime, nullable=False, default=datetime.now())
-    job = Column(String(50), nullable=False)
+    job = Column(String(50), nullable=True)
     
     contacts = relationship("PartnerContact", back_populates="contact")
     contracts = relationship("Contract", back_populates="contact")
@@ -51,7 +51,6 @@ class Contact(Base):
             "updated_by": self.updated_by,
             "updated_date": self.updated_date
             }
-  
         
 class PartnerContact(Base):
     """Asociación entre Cliente y Contactos"""

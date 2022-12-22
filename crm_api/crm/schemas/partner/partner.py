@@ -1,8 +1,10 @@
 """coding=utf-8."""
  
 from datetime import datetime, date
-from pydantic import BaseModel, EmailStr, ValidationError, validator
-from typing import Optional
+from pydantic import BaseModel, ValidationError, validator
+from typing import Optional, List
+
+from ...schemas.partner.contact import ContactCreate
 
 from uuid import UUID
  
@@ -19,8 +21,7 @@ class PartnerBase(BaseModel):
     registration_user: Optional[str]
     registration_date: Optional[date] = None
     
-    contacts: dict = {}
-    contacts: list = []
+    contacts: List[ContactCreate]
     
     @validator('type')
     def partner_type(cls, type):

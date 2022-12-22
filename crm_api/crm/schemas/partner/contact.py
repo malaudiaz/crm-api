@@ -31,7 +31,13 @@ class ContactShema(ContactBase):
  
     class Config:
         orm_mode = True
- 
+
+class ContactCreate(ContactBase):
+    id: str
+    
+    class Config:
+        orm_mode = True
+    
 class PartnerContactRelation(BaseModel):
     id_partner: str
     id_contact: str

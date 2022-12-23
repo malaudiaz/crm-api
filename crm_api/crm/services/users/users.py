@@ -108,6 +108,13 @@ def new(request, db: Session, user: UserCreate):
 def get_one(user_id: str, db: Session):  
     return db.query(Users).filter(Users.id == user_id).first()
 
+def get_all_user_sign_contracts(db: Session):  
+    data = []
+    lst_data = db.query(Users).filter(Users.sign_contracts == True).all()
+    for item in lst_data:
+        data.append({'id': item.id, 'username' : item.username, 'fullname': item.fullname})
+    return data
+
 def delete(user_id: str, db: Session):
     try:
         db_user = db.query(Users).filter(Users.id == user_id).first()

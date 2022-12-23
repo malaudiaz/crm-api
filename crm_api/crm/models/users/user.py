@@ -40,7 +40,7 @@ class Users(Base):
             "password": self.password,
             "is_active": self.is_active,
             "selected": self.selected,
-            sign_contracts: self.sign_contracts
+            "sign_contracts": self.sign_contracts
         }
     
 # Base.metadata.create_all(bind=engine)

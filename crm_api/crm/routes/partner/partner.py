@@ -39,12 +39,6 @@ def get_partner_by_registration_number(registration_number: str, db: Session = D
 def create_partner(request:Request, partner: PartnerBase, db: Session = Depends(get_db)):
     return new(request=request, partner=partner, db=db)
 
-# @partner_route.post("/partners", summary="Crear un Cliente")
-# def create_partner(partner: Dict[Any, Any], db: Session = Depends(get_db)):
-#     print(partner)
-#     return True
-#     return new(partner=partner, db=db)
-
 @partner_route.delete("/partners/{id}", status_code=status.HTTP_200_OK, summary="Desactivar un Cliente por su ID")
 def delete_partner(id: uuid.UUID, db: Session = Depends(get_db)):
     is_delete = delete(partner_id=str(id), db=db)

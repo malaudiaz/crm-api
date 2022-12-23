@@ -37,6 +37,8 @@ class Contract(Base):
     partner = relationship("Partner", back_populates="contracts")
     contact = relationship("Contact", back_populates="contracts")
     supplement = relationship("Contract") #, back_populates="suplements")
+    
+    status_id = Column(String(35), nullable=False)
             
     def dict(self):
         return {

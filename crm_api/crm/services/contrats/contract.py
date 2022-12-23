@@ -8,6 +8,7 @@ from ...schemas.contracts.contracts import ContractBase, ContractShema
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from passlib.context import CryptContext
+from crm.functions_jwt import get_current_user
 from ...auth_bearer import decodeJWT
 from typing import List
 
@@ -54,12 +55,15 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
 def get_one(contract_id: str, db: Session):  
     return db.query(Contract).filter(Contract.id == contract_id).first()
 
-def new(db: Session, contract: ContractBase):
+def new(request, db: Session, contract: ContractBase):
+    
+    currentUser = get_current_user(request) 
     
     db_contract = Contract(number=contract.number, id_partner=contract.id_partner, id_contact=contract.id_contact, sign_by=contract.sign_by,
                            sign_date=contract.sign_date, initial_aproved_import=contract.initial_aproved_import, 
                            real_aproved_import=contract.initial_aproved_import, real_import=contract.initial_aproved_import,
-                           is_supplement=contract.is_supplement, created_by='foo', updated_by='foo')
+                           is_supplement=False, created_by=currentUser['username'], updated_by=currentUser['username'],
+                           status_name='DELIVERED')
   
     try:
         db.add(db_contract)

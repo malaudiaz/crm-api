@@ -38,7 +38,7 @@ class Contract(Base):
     contact = relationship("Contact", back_populates="contracts")
     supplement = relationship("Contract") #, back_populates="suplements")
     
-    status_name = Column(String(35), nullable=False)
+    status_name = Column(String(50), ForeignKey("resources.status_element.name"), nullable=True, default='DELIVERED')
             
     def dict(self):
         return {
@@ -55,6 +55,7 @@ class Contract(Base):
             "created_by": self.created_by,
             "created_date": self.created_date,
             "updated_by": self.updated_by,
-            "updated_date": self.updated_date
+            "updated_date": self.updated_date,
+            'status_name': self.status_name
         }
     

@@ -13,9 +13,6 @@ class ContractBase(BaseModel):
     sign_by: Optional[str]
     sign_date: Optional[date]
     initial_aproved_import: float
-    real_aproved_import: float
-    real_import: float
-    is_supplement: bool
     
     @validator('number')
     def number_not_empty(cls, number):
@@ -48,6 +45,10 @@ class ContractShema(ContractBase):
     updated_date: datetime
     created_by: str
     updated_by: str
+    
+    real_aproved_import: float
+    real_import: float
+    is_supplement: bool
  
     class Config:
         orm_mode = True

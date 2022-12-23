@@ -28,8 +28,8 @@ def get_contract_by_id(id: str, db: Session = Depends(get_db)):
     return get_one(contract_id=id, db=db)
 
 @contract_route.post("/contracts", response_model=ContractShema, summary="Crear un Contrato")
-def create_contract(contract: ContractBase, db: Session = Depends(get_db)):
-    return new(contract=contract, db=db)
+def create_contract(request:Request, contract: ContractBase, db: Session = Depends(get_db)):
+    return new(request=request, contract=contract, db=db)
 
 @contract_route.delete("/contracts/{id}", status_code=status.HTTP_200_OK, summary="Desactivar un Contrato por su ID")
 def delete_contract(id: uuid.UUID, db: Session = Depends(get_db)):

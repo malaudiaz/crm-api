@@ -16,4 +16,3 @@ class StatusShema(StatusBase):
  
     class Config:
         orm_mode = True
-        

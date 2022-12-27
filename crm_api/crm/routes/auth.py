@@ -34,7 +34,7 @@ auth_routes = APIRouter()
 def login(user: UserLogin, db: Session = Depends(get_db)):
     return auth(db=db, user=user)
 
-@auth_routes.get('/me', summary='Get details of currently logged in user', dependencies=[Depends(JWTBearer())])
+@auth_routes.get('/me', summary='Obtiene información del usuario autentificado', dependencies=[Depends(JWTBearer())])
 async def get_me(request:Request):
     user = get_current_user(request)       
     return JSONResponse(content=user, status_code=200)

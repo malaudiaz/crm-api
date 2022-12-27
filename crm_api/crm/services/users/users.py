@@ -53,7 +53,7 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
       
     str_where = "WHERE is_active=True " 
     str_count = "Select count(*) FROM enterprise.users "
-    str_query = "Select id, username, fullname, dni, email, job, phone FROM enterprise.users "
+    str_query = "Select id, username, fullname, dni, email, job, phone, password FROM enterprise.users "
     
     dict_query = {'username': " AND username ilike '%" + criteria_value + "%'",
                   'fullname': " AND fullname ilike '%" + criteria_value + "%'",
@@ -71,8 +71,8 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
     lst_data = db.execute(str_query)
     data = []
     for item in lst_data:
-        data.append({'id': item['id'], 'username' : item['username'], 'fullname': item['fullname'], 
-                     'dni': item['dni'], 'email': item['email'], 'job': item['job'], 'phone': item['phone'], 'selected': False})
+        data.append({'id': item['id'], 'username' : item['username'], 'fullname': item['fullname'], 'dni': item['dni'], 
+            'email': item['email'], 'job': item['job'], 'phone': item['phone'], 'password': item['password'], 'selected': False})
     
     return {"page": page, "per_page": per_page, "total": total, "total_pages": total_pages, "data": data}
 

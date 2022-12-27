@@ -74,6 +74,37 @@ def get_contacts_by_partner(page: int, per_page: int, partner_id: str, db: Sessi
     
     return {"page": page, "per_page": per_page, "total": total, "total_pages": total_pages, "data": data}
 
+def get_lst_contacts_by_partner_id(partner_id: str, db: Session): 
+    
+    str_query = "SELECT id_contact, name, address, dni, email, phone, mobile, job " \
+        "FROM partner.partners_contacts pac " \
+        "JOIN partner.contacts con ON con.id = pac.id_contact " \
+        "WHERE con.is_active=True AND id_partner = '" + partner_id + "' " \
+        "ORDER BY name"
+    
+    lst_data = db.execute(str_query)
+    data = []
+    for item in lst_data:
+        data.append({'id': item['id_contact'], 'name' : item['name'], 'address': item['address'], 
+                     'dni': item['dni'], 'email': item['email'], 'phone': item['phone'], 
+                     'mobile': item['mobile'], 'job': item['job'], 'selected': False})
+    
+    return data
+
+def get_lst_contact_id_by_partner_id(partner_id: str, db: Session): 
+    
+    str_query = "SELECT id_contact FROM partner.partners_contacts pac " \
+        "JOIN partner.contacts con ON con.id = pac.id_contact " \
+        "WHERE con.is_active=True AND id_partner = '" + partner_id + "' "
+    
+    lst_data = db.execute(str_query)
+    
+    data = []
+    for item in lst_data:
+        data.append(item['id_contact'])
+    
+    return data
+
 def new(db: Session, contact: ContactBase):
     
     db_contact = Contact(name=contact.name, job=contact.job, address=contact.address, dni=contact.dni, 
@@ -189,6 +220,20 @@ def desasociate_partner_contact(partnercontactdelete: PartnerContactRelation, db
         print(e)
         raise HTTPException(status_code=404, detail="No es posible eliminar")
 
+def desasociate_partner_one_contact(partner_id: str, contact_id:str, db: Session):
+    
+    db_partnercontact = db.query(PartnerContact).filter_by(id_partner = partner_id, id_contact = contact_id).first()
+    if not db_partnercontact:
+        return True
+    
+    try:
+        db.delete(db_partnercontact)
+        db.commit()
+        return True
+    except (Exception, SQLAlchemyError) as e:
+        print(e)
+        raise HTTPException(status_code=404, detail="No es posible eliminar")
+    
 def asociate_partner_contact_with_object(partner_id: str, contact: ContactCreate, user_name: str, db: Session):
     
     one_contact = get_one(contact.id, db=db)
@@ -211,3 +256,25 @@ def asociate_partner_contact_with_object(partner_id: str, contact: ContactCreate
         print(e)
         msg = 'Ha ocurrido un error al asociar el cliente y su contacto'               
         raise HTTPException(status_code=403, detail=msg)
+    
+def update_partner_contact_with_object(partner_id: str, contacts: List[ContactCreate], user_name: str, db: Session):
+    
+    lst_contacts_initial = get_lst_contact_id_by_partner_id(partner_id, db=db)
+    
+    lst_contacts_currrent = []
+    
+    for item_co in contacts:
+        # puede existir o no el contacto..., también puede eliminarse
+        if item_co.id:
+            lst_contacts_currrent.append(item_co.id)
+            
+        asociate_partner_contact_with_object(
+            partner_id=partner_id, contact=item_co, user_name=user_name, db=db)
+    
+    # borrar los que ya no vienen
+    for item in lst_contacts_initial:
+        if item in lst_contacts_currrent:
+            continue
+        desasociate_partner_one_contact(partner_id=partner_id, contact_id=item, db=db)
+        
+    return True

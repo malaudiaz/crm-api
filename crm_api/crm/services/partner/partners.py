@@ -1,12 +1,13 @@
 # partner.py
 
 import math
+import datetime
 from unicodedata import name
 from fastapi import HTTPException
 from ...models.partner.partner import Partner
 from ...models.partner.contacto import PartnerContact
 from ...schemas.partner.partner import PartnerBase, PartnerShema
-from ...services.partner.contact import asociate_partner_contact_with_object
+from ...services.partner.contact import asociate_partner_contact_with_object, update_partner_contact_with_object
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from passlib.context import CryptContext
@@ -80,23 +81,31 @@ def new(request, db: Session, partner: PartnerBase):
         msg = 'Ha ocurrido un error al crear el cliente'               
         raise HTTPException(status_code=403, detail=msg)
     
-def delete(partner_id: str, db: Session):
+def delete(request, partner_id: str, db: Session):
+    
+    currentUser = get_current_user(request) 
+    
     try:
         db_partner = db.query(Partner).filter(Partner.id == partner_id).first()
         db_partner.is_active = False
-        db_partner.updated_by = 'foo'
+        db_partner.updated_by = currentUser['username']
         db.commit()
         return True
     except (Exception, SQLAlchemyError) as e:
         print(e)
         raise HTTPException(status_code=404, detail="No es posible eliminar")
     
-def update(partner_id: str, partner: PartnerBase, db: Session):
+def update(request, partner_id: str, partner: PartnerBase, db: Session):
+    
+    currentUser = get_current_user(request) 
        
     db_partner = db.query(Partner).filter(Partner.id == partner_id).first()
-    db_partner.is_active = False
-    db_partner.updated_by = 'foo'
-    db_partner.type=partner.type
+    if not db_partner:
+        raise HTTPException(status_code=400, detail="No existe cliente con ese ID")
+    
+    db_partner.updated_by = currentUser['username']
+    db_partner.updated_date = datetime.datetime.now()
+
     db_partner.name=partner.name
     db_partner.address=partner.address
     db_partner.dni=partner.dni
@@ -112,7 +121,11 @@ def update(partner_id: str, partner: PartnerBase, db: Session):
         db.add(db_partner)
         db.commit()
         db.refresh(db_partner)
-        return db_partner
+        
+        if partner.contacts:
+            update_partner_contact_with_object(
+                    partner_id=db_partner.id, contacts=partner.contacts, user_name=currentUser['username'], db=db)
+        return True
     except (Exception, SQLAlchemyError) as e:
         print(e.code)
         if e.code == "gkpj":

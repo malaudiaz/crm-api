@@ -19,10 +19,11 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
     
     str_where = " WHERE cont.is_active=True "
     str_inner = " INNER JOIN partner.partners pa ON pa.id = cont.id_partner INNER JOIN partner.contacts co ON co.id = cont.id_contact " \
-        "JOIN resources.status_element st ON st.name = cont.status_name "
+        "JOIN resources.status_element st ON st.name = cont.status_name " \
+        "LEFT JOIN enterprise.users us ON us.id = cont.sign_by "
     str_count = "Select count(*) FROM contract.contracts cont"
-    str_query = "Select cont.id, number, pa.name as partner_name, co.name as contact_name, sign_by, sign_date, " \
-        "initial_aproved_import, real_aproved_import, real_import, " \
+    str_query = "Select cont.id, number, pa.name as partner_name, co.name as contact_name, sign_by,  us.fullname as sign_full_name, " \
+        "sign_date, initial_aproved_import, real_aproved_import, real_import, " \
         "is_supplement, contract_id, cont.created_date, status_name, st.description as status_description " \
         "FROM contract.contracts cont "
     
@@ -43,12 +44,13 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
     total_pages=total/per_page if (total % per_page == 0) else math.trunc(total / per_page) + 1
     
     str_query += " ORDER BY number LIMIT " + str(per_page) + " OFFSET " + str(page*per_page-per_page)
-     
+    
     lst_data = db.execute(str_query)
     data = []
     for item in lst_data:
         data.append({'id': item['id'], 'number' : item['number'], 'partner': item['partner_name'], 
-                     'contact': item['contact_name'], 'sign_by': item['sign_by'], 'sign_date': item['sign_date'], 
+                     'contact': item['contact_name'], 'sign_by': item['sign_by'], 'sign_full_name': item['sign_full_name'], 
+                     'sign_date': item['sign_date'], 
                      'initial_aproved_import': item['initial_aproved_import'], 'real_aproved_import': item['real_aproved_import'],  
                      'real_import': item['real_import'], 'selected': False, 'status_name': item['status_name'], 
                     "status_description": item['status_description']})

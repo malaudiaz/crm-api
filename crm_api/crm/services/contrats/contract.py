@@ -18,7 +18,8 @@ from ...services.partner.contact import get_one as contact_get_one
 def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db: Session):  
     
     str_where = " WHERE cont.is_active=True "
-    str_inner = " INNER JOIN partner.partners pa ON pa.id = cont.id_partner INNER JOIN partner.contacts co ON co.id = cont.id_contact " \
+    str_inner = " INNER JOIN partner.partners pa ON pa.id = cont.id_partner " \
+        "INNER JOIN partner.contacts co ON co.id = cont.id_contact " \
         "JOIN resources.status_element st ON st.name = cont.status_name " \
         "LEFT JOIN enterprise.users us ON us.id = cont.sign_by "
     str_count = "Select count(*) FROM contract.contracts cont"

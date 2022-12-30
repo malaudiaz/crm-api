@@ -46,5 +46,7 @@ class PartnerShema(PartnerBase):
     created_by: str
     updated_by: str
     
+    contacts: List = []
+    
     class Config:
         orm_mode = True

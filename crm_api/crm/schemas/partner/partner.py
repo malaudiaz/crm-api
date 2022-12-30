@@ -48,4 +48,3 @@ class PartnerShema(PartnerBase):
     
     class Config:
         orm_mode = True
-

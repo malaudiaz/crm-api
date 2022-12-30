@@ -45,8 +45,7 @@ class PartnerShema(PartnerBase):
     updated_date: datetime
     created_by: str
     updated_by: str
-    selected: bool = False
- 
+    
     class Config:
         orm_mode = True
 

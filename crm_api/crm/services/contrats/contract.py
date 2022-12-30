@@ -102,9 +102,10 @@ def update(contract_id: str, contract: ContractBase, db: Session):
     db_contract.sign_by=contract.sign_by
     db_contract.sign_date=contract.sign_date
     db_contract.initial_aproved_import=contract.initial_aproved_import
-    db_contract.real_aproved_import=contract.real_aproved_import
-    db_contract.real_import=contract.real_import
-    db_contract.is_supplement=contract.is_supplement
+    db_contract.status_name = contract.status_name
+    # db_contract.real_aproved_import=contract.real_aproved_import
+    # db_contract.real_import=contract.real_import
+    # db_contract.is_supplement=contract.is_supplement
                            
     try:
         db.add(db_contract)

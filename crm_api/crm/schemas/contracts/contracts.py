@@ -14,6 +14,8 @@ class ContractBase(BaseModel):
     sign_date: Optional[date]
     initial_aproved_import: float
     
+    status_name: Optional[str] = 'DELIVERED'
+    
     @validator('number')
     def number_not_empty(cls, number):
         if not number:

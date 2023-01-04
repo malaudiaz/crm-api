@@ -60,8 +60,8 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
                   'id': " AND id = '" + criteria_value + "' ",
                   'dni': " AND dni ilike '%" + criteria_value + "%'"}
     
-    if criteria_key not in dict_query:
-        raise HTTPException(status_code=404, detail="Parametro no válido") 
+    if criteria_key and criteria_key not in dict_query:
+        raise HTTPException(status_code=404, detail="Parametro no válido")
     
     str_where = str_where + dict_query[criteria_key] if criteria_value else ""  
     str_count += str_where 

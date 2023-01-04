@@ -33,6 +33,9 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
                   'partner_name': " AND pa.name ilike '%" + criteria_value + "%'",
                   'contact_name': " AND co.name ilike '%" + criteria_value + "%'"}
     
+    if criteria_key not in dict_query:
+        raise HTTPException(status_code=404, detail="Parametro no válido") 
+    
     str_count += str_inner
     str_query += str_inner
     

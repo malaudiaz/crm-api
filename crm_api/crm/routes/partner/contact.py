@@ -56,10 +56,10 @@ def delete_contact(id: uuid.UUID, db: Session = Depends(get_db)):
 def update_contact(id: uuid.UUID, contact: ContactBase, db: Session = Depends(get_db)):
     return update(db=db, contact_id=str(id), contact=contact)
 
-@contact_route.post("/contacts/asociate", summary="Asociar un Contacto a un Cliente")
-def asociate_at_partner(partnercontact: PartnerContactBase, db: Session = Depends(get_db)):
-    return asociate_partner_contact(partnercontact=partnercontact, db=db)
+# @contact_route.post("/contacts/asociate", summary="Asociar un Contacto a un Cliente")
+# def asociate_at_partner(partnercontact: PartnerContactBase, db: Session = Depends(get_db)):
+#     return asociate_partner_contact(partnercontact=partnercontact, db=db)
 
-@contact_route.post("/contacts/desasociate", summary="Desasociar un Contacto a un Cliente")
-def desasociate_at_partner(partnercontactdelete: PartnerContactRelation, db: Session = Depends(get_db)):
-    return desasociate_partner_contact(partnercontactdelete, db=db)
+# @contact_route.post("/contacts/desasociate", summary="Desasociar un Contacto a un Cliente")
+# def desasociate_at_partner(partnercontactdelete: PartnerContactRelation, db: Session = Depends(get_db)):
+#     return desasociate_partner_contact(partnercontactdelete, db=db)

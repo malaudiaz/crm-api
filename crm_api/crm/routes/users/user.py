@@ -52,11 +52,13 @@ def update_user(id: uuid.UUID, user: UserBase, db: Session = Depends(get_db)):
 
 @user_route.post("/users/password", summary="Cambiar passwoord a un Usuario")
 def reset_password(
-    username: str, 
+    request:Request,
     current_password: str, 
     new_password: str,
     renew_password: str,
+    username: str = "", 
     db: Session = Depends(get_db)
 ):
     return change_password(
-        db=db, username=username, current_password=current_password, new_password=new_password, renew_password=renew_password)
+        request=request, db=db, username=username, current_password=current_password, 
+        new_password=new_password, renew_password=renew_password)

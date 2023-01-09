@@ -153,7 +153,12 @@ def update(user_id: str, user: UserBase, db: Session):
         if e.code == "gkpj":
             raise HTTPException(status_code=400, detail="Ya existe un usuario con este Nombre")
 
-def change_password(db: Session, username: str, current_password: str, new_password: str, renew_password: str):  
+def change_password(request, db: Session, username: str, current_password: str, new_password: str, renew_password: str):  
+    
+    # if el user_name viene vacio cojo el usario logueado
+    if not username:
+        currentUser = get_current_user(request)
+        username = currentUser['username'] 
     
     # verificar que existe ese usuario con ese password
     one_user = get_one_by_username(username=username, db=db)

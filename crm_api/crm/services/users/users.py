@@ -191,3 +191,4 @@ def change_password(request, db: Session, username: str, current_password: str, 
         
     else:
         raise HTTPException(status_code=405, detail="Contraseña incorrecta")
+

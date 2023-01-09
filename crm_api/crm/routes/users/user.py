@@ -62,3 +62,4 @@ def reset_password(
     return change_password(
         request=request, db=db, username=username, current_password=current_password, 
         new_password=new_password, renew_password=renew_password)
+

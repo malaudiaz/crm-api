@@ -46,9 +46,9 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
         data.append({'id': item['id'], 'name' : item['name'], 'address': item['address'], 
                      'dni': item['dni'], 'email': item['email'], 'phone': item['phone'], 
                      'mobile': item['mobile'], 'nit': item['nit'], 'is_provider': item['is_provider'], 
-                     'created_by': item['created_by'], 'nit': item['nit'], 'registration_number': item['registration_number'], 'type': item['type'],
-                     'registration_user': item['registration_user'], 'registration_date': item['registration_date'],  
-                     'selected': False})
+                     'created_by': item['created_by'], 'nit': item['nit'], 'registration_number': item['registration_number'], 
+                     'type': item['type'], 'registration_user': item['registration_user'], 
+                     'registration_date': item['registration_date'],  'selected': False})
     
     return {"page": page, "per_page": per_page, "total": total, "total_pages": total_pages, "data": data}
 

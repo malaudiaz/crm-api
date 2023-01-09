@@ -5,7 +5,8 @@ from crm.schemas.users.user import UserShema, UserCreate, UserBase
 from sqlalchemy.orm import Session
 from crm.app import get_db
 from typing import List, Dict
-from crm.services.users.users import get_all, new, get_one, delete, update, get_all_user_sign_contracts
+from crm.services.users.users import get_all, new, get_one, delete, update, \
+    get_all_user_sign_contracts, change_password
 from starlette import status
 from crm.auth_bearer import JWTBearer
 import uuid
@@ -48,3 +49,14 @@ def delete_user(id: uuid.UUID, db: Session = Depends(get_db)):
 @user_route.put("/users/{id}", response_model=UserShema, summary="Actualizar un Usuario por su ID")
 def update_user(id: uuid.UUID, user: UserBase, db: Session = Depends(get_db)):
     return update(db=db, user_id=str(id), user=user)
+
+@user_route.post("/users/password", summary="Cambiar passwoord a un Usuario")
+def reset_password(
+    username: str, 
+    current_password: str, 
+    new_password: str,
+    renew_password: str,
+    db: Session = Depends(get_db)
+):
+    return change_password(
+        db=db, username=username, current_password=current_password, new_password=new_password, renew_password=renew_password)

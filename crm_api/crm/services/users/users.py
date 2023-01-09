@@ -90,7 +90,8 @@ def new(request, db: Session, user: UserCreate):
         raise HTTPException(status_code=404, detail="Error en los datos, " + pass_check['message'])             
     
     user.password = pwd_context.hash(user.password)  
-    db_user = Users(username=user.username, fullname=user.fullname, dni=user.dni, job=user.job, email=user.email, phone=user.phone, password=user.password, selected=False)
+    db_user = Users(username=user.username, fullname=user.fullname, dni=user.dni, job=user.job, 
+                    email=user.email, phone=user.phone, password=user.password, selected=False)
         
     try:
         db.add(db_user)
@@ -111,6 +112,9 @@ def new(request, db: Session, user: UserCreate):
     
 def get_one(user_id: str, db: Session):  
     return db.query(Users).filter(Users.id == user_id).first()
+
+def get_one_by_username(username: str, db: Session):  
+    return db.query(Users).filter(Users.username == username, Users.is_active == True).first()
 
 def get_all_user_sign_contracts(db: Session):  
     data = []
@@ -148,3 +152,37 @@ def update(user_id: str, user: UserBase, db: Session):
         print(e.code)
         if e.code == "gkpj":
             raise HTTPException(status_code=400, detail="Ya existe un usuario con este Nombre")
+
+def change_password(db: Session, username: str, current_password: str, new_password: str, renew_password: str):  
+    
+    # verificar que existe ese usuario con ese password
+    one_user = get_one_by_username(username=username, db=db)
+    if not one_user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    
+    if pwd_context.verify(current_password, one_user.password):
+        
+        # verificar que las contrasenas nuevas son iguales
+        if str(new_password) != str(renew_password):
+            raise HTTPException(status_code=404, detail="Nueva Contraseña y Repetición de contraseña no coinciden")
+        
+        #verificando que tenga la estructura correcta
+        pass_check = password_check(new_password, 8, 15)   
+        if not pass_check['success']:
+            raise HTTPException(status_code=404, detail="Error en el nuevo password, " + pass_check['message']) 
+        
+        #cambiando el paswword al usuario
+        one_user.password = pwd_context.hash(new_password)
+        
+        try:
+            db.add(one_user)
+            db.commit()
+            db.refresh(one_user)
+            return True
+        except (Exception, SQLAlchemyError) as e:
+            print(e.code)
+            if e.code == "gkpj":
+                raise HTTPException(status_code=400, detail="Error cambiando password en BD")
+        
+    else:
+        raise HTTPException(status_code=405, detail="Contraseña incorrecta")

@@ -1,7 +1,7 @@
 # Routes user.py
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from crm.schemas.users.user import UserShema, UserCreate, UserBase
+from crm.schemas.users.user import UserShema, UserCreate, UserBase, ChagePasswordSchema
 from sqlalchemy.orm import Session
 from crm.app import get_db
 from typing import List, Dict
@@ -53,13 +53,9 @@ def update_user(id: uuid.UUID, user: UserBase, db: Session = Depends(get_db)):
 @user_route.post("/users/password", summary="Cambiar passwoord a un Usuario")
 def reset_password(
     request:Request,
-    current_password: str, 
-    new_password: str,
-    renew_password: str,
-    username: str = "", 
+    password: ChagePasswordSchema,
     db: Session = Depends(get_db)
 ):
     return change_password(
-        request=request, db=db, username=username, current_password=current_password, 
-        new_password=new_password, renew_password=renew_password)
+        request=request, db=db, password=password)
 

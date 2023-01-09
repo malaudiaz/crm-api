@@ -2,7 +2,7 @@
 
 from fastapi import HTTPException
 from crm.models.users.user import Users
-from crm.schemas.users.user import UserCreate, UserBase
+from crm.schemas.users.user import UserCreate, UserBase, ChagePasswordSchema
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from passlib.context import CryptContext
@@ -153,10 +153,10 @@ def update(user_id: str, user: UserBase, db: Session):
         if e.code == "gkpj":
             raise HTTPException(status_code=400, detail="Ya existe un usuario con este Nombre")
 
-def change_password(request, db: Session, username: str, current_password: str, new_password: str, renew_password: str):  
+def change_password(request, db: Session, password: ChagePasswordSchema):  
     
     # if el user_name viene vacio cojo el usario logueado
-    if not username:
+    if not password.username:
         currentUser = get_current_user(request)
         username = currentUser['username'] 
     
@@ -165,19 +165,19 @@ def change_password(request, db: Session, username: str, current_password: str, 
     if not one_user:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     
-    if pwd_context.verify(current_password, one_user.password):
+    if pwd_context.verify(password.current_password, one_user.password):
         
         # verificar que las contrasenas nuevas son iguales
-        if str(new_password) != str(renew_password):
-            raise HTTPException(status_code=404, detail="Nueva Contraseña y Repetición de contraseña no coinciden")
+        if str(password.new_password) != str(password.renew_password):
+            raise HTTPException(status_code=404, detail="La contraseña nueva y la confirmación no coinciden")
         
         #verificando que tenga la estructura correcta
-        pass_check = password_check(new_password, 8, 15)   
+        pass_check = password_check(password.new_password, 8, 15)   
         if not pass_check['success']:
             raise HTTPException(status_code=404, detail="Error en el nuevo password, " + pass_check['message']) 
         
         #cambiando el paswword al usuario
-        one_user.password = pwd_context.hash(new_password)
+        one_user.password = pwd_context.hash(password.new_password)
         
         try:
             db.add(one_user)

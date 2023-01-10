@@ -159,6 +159,8 @@ def change_password(request, db: Session, password: ChagePasswordSchema):
     if not password.username:
         currentUser = get_current_user(request)
         username = currentUser['username'] 
+    else:
+        username = password.username
     
     # verificar que existe ese usuario con ese password
     one_user = get_one_by_username(username=username, db=db)

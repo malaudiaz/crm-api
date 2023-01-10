@@ -24,7 +24,7 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
     
     dict_query = {'name': " AND name ilike '%" + criteria_value + "%'",
                   'nit': " AND nit = '" + criteria_value + "'",
-                  'type': " AND type = '" + criteria_value + "'",
+                  'type': " AND type ilike '%" + criteria_value + "%'",
                   'registration_number': " AND registration_number = '" + criteria_value + "'",
                   'dni': " AND dni ilike '%" + criteria_value + "%'"}
     

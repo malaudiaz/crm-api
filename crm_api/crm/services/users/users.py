@@ -61,6 +61,7 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
                   'dni': " AND dni ilike '%" + criteria_value + "%'"}
     
     if criteria_key and criteria_key not in dict_query:
+        # return #{"sucess": False, "status_code": '404', "error_msg": "Parametro no válido"}
         raise HTTPException(status_code=404, detail="Parametro no válido")
     
     str_where = str_where + dict_query[criteria_key] if criteria_value else ""  
@@ -78,7 +79,8 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
         data.append({'id': item['id'], 'username' : item['username'], 'fullname': item['fullname'], 'dni': item['dni'], 
             'email': item['email'], 'job': item['job'], 'phone': item['phone'], 'password': item['password'], 'selected': False})
     
-    return {"page": page, "per_page": per_page, "total": total, "total_pages": total_pages, "data": data}
+    # return {"page": page, "per_page": per_page, "total": total, "total_pages": total_pages, "data": data,
+    #         "sucess": True, "status_code": '200'}
 
 def new(request, db: Session, user: UserCreate):  
     # Para obtener el usuario logueado descomentar estas dos líneas. 

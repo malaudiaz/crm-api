@@ -79,8 +79,8 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
         data.append({'id': item['id'], 'username' : item['username'], 'fullname': item['fullname'], 'dni': item['dni'], 
             'email': item['email'], 'job': item['job'], 'phone': item['phone'], 'password': item['password'], 'selected': False})
     
-    # return {"page": page, "per_page": per_page, "total": total, "total_pages": total_pages, "data": data,
-    #         "sucess": True, "status_code": '200'}
+    return {"page": page, "per_page": per_page, "total": total, "total_pages": total_pages, "data": data,
+            "sucess": True, "status_code": '200'}
 
 def new(request, db: Session, user: UserCreate):  
     # Para obtener el usuario logueado descomentar estas dos líneas. 
@@ -187,7 +187,7 @@ def change_password(request, db: Session, password: ChagePasswordSchema):
             db.add(one_user)
             db.commit()
             db.refresh(one_user)
-            return True
+            return {"sucess": True, "status_code": '200', "detail": "Operación satisfactoria"}
         except (Exception, SQLAlchemyError) as e:
             print(e.code)
             if e.code == "gkpj":

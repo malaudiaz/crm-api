@@ -3,6 +3,7 @@
 from fastapi import HTTPException
 from crm.models.users.user import Users
 from crm.schemas.users.user import UserCreate, UserBase, ChagePasswordSchema
+from crm.schemas.resources.result_object import ResultObject
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from passlib.context import CryptContext
@@ -51,6 +52,7 @@ def password_check(passwd, min_len, max_len):
 
 def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db: Session):    
       
+    result = ResultObject(page=page, per_page=per_page)  
     str_where = "WHERE is_active=True " 
     str_count = "Select count(*) FROM enterprise.users "
     str_query = "Select id, username, fullname, dni, email, job, phone, password FROM enterprise.users "
@@ -61,32 +63,32 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
                   'dni': " AND dni ilike '%" + criteria_value + "%'"}
     
     if criteria_key and criteria_key not in dict_query:
-        # return #{"sucess": False, "status_code": '404', "error_msg": "Parametro no válido"}
         raise HTTPException(status_code=404, detail="Parametro no válido")
     
     str_where = str_where + dict_query[criteria_key] if criteria_value else ""  
     str_count += str_where 
     str_query += str_where
     
-    total = db.execute(str_count).scalar()
-    total_pages=total/per_page if (total % per_page == 0) else math.trunc(total / per_page) + 1
+    result.total = db.execute(str_count).scalar()
+    result.total_pages=result.total/result.per_page if (result.total % result.per_page == 0) else math.trunc(result.total / result.per_page) + 1
     
-    str_query += " ORDER BY username LIMIT " + str(per_page) + " OFFSET " + str(page*per_page-per_page)
+    str_query += " ORDER BY username LIMIT " + str(result.per_page) + " OFFSET " + str(result.page*result.per_page-result.per_page)
      
     lst_data = db.execute(str_query)
-    data = []
+    result.data = []
     for item in lst_data:
-        data.append({'id': item['id'], 'username' : item['username'], 'fullname': item['fullname'], 'dni': item['dni'], 
+        result.data.append({'id': item['id'], 'username' : item['username'], 'fullname': item['fullname'], 'dni': item['dni'], 
             'email': item['email'], 'job': item['job'], 'phone': item['phone'], 'password': item['password'], 'selected': False})
     
-    return {"page": page, "per_page": per_page, "total": total, "total_pages": total_pages, "data": data,
-            "sucess": True, "status_code": '200'}
-
+    return result
+    
 def new(request, db: Session, user: UserCreate):  
     # Para obtener el usuario logueado descomentar estas dos líneas. 
     # currentUser = get_current_user(request)      
     # print(currentUser)
 
+    result = ResultObject()  
+    
     pass_check = password_check(user.password, 8, 15)   
     if not pass_check['success']:
         raise HTTPException(status_code=404, detail="Error en los datos, " + pass_check['message'])             
@@ -99,7 +101,7 @@ def new(request, db: Session, user: UserCreate):
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
-        return db_user
+        return result # db_user
     except (Exception, SQLAlchemyError, IntegrityError) as e:
         print(e)
         msg = 'Ha ocurrido un error al crear el usuario'
@@ -107,23 +109,29 @@ def new(request, db: Session, user: UserCreate):
             field_name = str(e.__dict__['orig']).split('"')[1].split('_')[1]
             if field_name == 'username':
                 msg = msg + ', el nombre de usuario ya existe'
-            if field_name == 'dni':
+            elif field_name == 'dni':
                 msg = msg + ', el dni ya existe'
+            elif field_name == 'email':
+                msg = msg + ', el email ya existe'
         
         raise HTTPException(status_code=403, detail=msg)
     
 def get_one(user_id: str, db: Session):  
-    return db.query(Users).filter(Users.id == user_id).first()
+    result = ResultObject() 
+    result.data = {}
+    result.data = db.query(Users).filter(Users.id == user_id).first()
+    return result #db.query(Users).filter(Users.id == user_id).first()
 
 def get_one_by_username(username: str, db: Session):  
     return db.query(Users).filter(Users.username == username, Users.is_active == True).first()
 
 def get_all_user_sign_contracts(db: Session):  
-    data = []
+    result = ResultObject() 
+    result.data = []
     lst_data = db.query(Users).filter(Users.sign_contracts == True).all()
     for item in lst_data:
-        data.append({'id': item.id, 'username' : item.username, 'fullname': item.fullname})
-    return data
+        result.data.append({'id': item.id, 'username' : item.username, 'fullname': item.fullname})
+    return result #data
 
 def delete(user_id: str, db: Session):
     try:
@@ -136,6 +144,8 @@ def delete(user_id: str, db: Session):
         raise HTTPException(status_code=404, detail="No es posible eliminar")
     
 def update(user_id: str, user: UserBase, db: Session):
+    
+    result = ResultObject() 
        
     db_user = db.query(Users).filter(Users.id == user_id).first()
     db_user.username = user.username
@@ -149,7 +159,7 @@ def update(user_id: str, user: UserBase, db: Session):
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
-        return db_user
+        return result # db_user
     except (Exception, SQLAlchemyError) as e:
         print(e.code)
         if e.code == "gkpj":
@@ -157,42 +167,47 @@ def update(user_id: str, user: UserBase, db: Session):
 
 def change_password(request, db: Session, password: ChagePasswordSchema):  
     
+    result = ResultObject() 
+    
     # if el user_name viene vacio cojo el usario logueado
+    
+    # si el usuario logueado es distinto al user_name (se trata de un admon, no hace falta contraseña anterior)
+    verify_current_pasw = True
     if not password.username:
         currentUser = get_current_user(request)
         username = currentUser['username'] 
     else:
         username = password.username
+        verify_current_pasw = False
     
     # verificar que existe ese usuario con ese password
     one_user = get_one_by_username(username=username, db=db)
     if not one_user:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     
-    if pwd_context.verify(password.current_password, one_user.password):
-        
-        # verificar que las contrasenas nuevas son iguales
-        if str(password.new_password) != str(password.renew_password):
-            raise HTTPException(status_code=404, detail="La contraseña nueva y la confirmación no coinciden")
-        
-        #verificando que tenga la estructura correcta
-        pass_check = password_check(password.new_password, 8, 15)   
-        if not pass_check['success']:
-            raise HTTPException(status_code=404, detail="Error en el nuevo password, " + pass_check['message']) 
-        
-        #cambiando el paswword al usuario
-        one_user.password = pwd_context.hash(password.new_password)
-        
-        try:
-            db.add(one_user)
-            db.commit()
-            db.refresh(one_user)
-            return {"sucess": True, "status_code": '200', "detail": "Operación satisfactoria"}
-        except (Exception, SQLAlchemyError) as e:
-            print(e.code)
-            if e.code == "gkpj":
-                raise HTTPException(status_code=400, detail="Error cambiando password en BD")
-        
-    else:
+    if verify_current_pasw and not pwd_context.verify(password.current_password, one_user.password):
         raise HTTPException(status_code=405, detail="Contraseña incorrecta")
+        
+        
+    # verificar que las contrasenas nuevas son iguales
+    if str(password.new_password) != str(password.renew_password):
+        raise HTTPException(status_code=404, detail="La contraseña nueva y la confirmación no coinciden")
+    
+    #verificando que tenga la estructura correcta
+    pass_check = password_check(password.new_password, 8, 15)   
+    if not pass_check['success']:
+        raise HTTPException(status_code=404, detail="Error en el nuevo password, " + pass_check['message']) 
+    
+    #cambiando el paswword al usuario
+    one_user.password = pwd_context.hash(password.new_password)
+    
+    try:
+        db.add(one_user)
+        db.commit()
+        db.refresh(one_user)
+        return result
+    except (Exception, SQLAlchemyError) as e:
+        print(e.code)
+        if e.code == "gkpj":
+            raise HTTPException(status_code=400, detail="Error cambiando password en BD")
 

@@ -134,11 +134,14 @@ def get_all_user_sign_contracts(db: Session):
     return result #data
 
 def delete(user_id: str, db: Session):
+    
+    result = ResultObject() 
+    
     try:
         db_user = db.query(Users).filter(Users.id == user_id).first()
         db.delete(db_user)
         db.commit()
-        return True
+        return result
     except (Exception, SQLAlchemyError) as e:
         print(e)
         raise HTTPException(status_code=404, detail="No es posible eliminar")

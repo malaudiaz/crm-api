@@ -43,7 +43,8 @@ def get_user_by_id(id: str, db: Session = Depends(get_db)):
 def get_users_sign_contracts(db: Session = Depends(get_db)):
     return get_all_user_sign_contracts(db=db)
 
-@user_route.delete("/users/{id}", status_code=status.HTTP_200_OK, summary="Eliminar un Usuario por su ID")
+# @user_route.delete("/users/{id}", status_code=status.HTTP_200_OK, summary="Eliminar un Usuario por su ID")
+@user_route.delete("/users/{id}", response_model=ResultObject, summary="Eliminar un Usuario por su ID")
 def delete_user(id: uuid.UUID, db: Session = Depends(get_db)):
     is_delete = delete(user_id=str(id), db=db)
     if is_delete:

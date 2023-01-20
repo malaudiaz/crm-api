@@ -2,10 +2,11 @@
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from ...schemas.partner.partner import PartnerBase, PartnerShema
+from ...schemas.resources.result_object import ResultObject
 from sqlalchemy.orm import Session
 from ...app import get_db
 from typing import List, Dict, Any
-from ...services.partner.partners import get_all, new, get_one, delete, update, get_one_by_registration_number
+from ...services.partner.partners import get_all, new, get_one_partner, delete, update
 from starlette import status
 from ...auth_bearer import JWTBearer
 import uuid
@@ -15,7 +16,7 @@ partner_route = APIRouter(
     dependencies=[Depends(JWTBearer())]
 )
 
-@partner_route.get("/partners", response_model=Dict, summary="Obtener lista de Clientes")
+@partner_route.get("/partners", response_model=ResultObject, summary="Obtener lista de Clientes")
 def get_partners(
     page: int = 1, 
     per_page: int = 6, 
@@ -25,20 +26,18 @@ def get_partners(
 ):
     return get_all(page=page, per_page=per_page, criteria_key=criteria_key, criteria_value=criteria_value, db=db)
     
-@partner_route.get("/partners/{id}", response_model=PartnerShema, summary="Obtener un Cliente por su ID")
+# @partner_route.get("/partners/{id}", response_model=PartnerShema, summary="Obtener un Cliente por su ID")
+@partner_route.get("/partners/{id}", response_model=ResultObject, summary="Obtener un Cliente por su ID")
 def get_partner_by_id(id: str, db: Session = Depends(get_db)):
-    return get_one(partner_id=id, db=db)
+    return get_one_partner(partner_id=id, db=db)
 
-# @partner_route.get("/partners/registration_number/{registration_number}", response_model=PartnerShema, 
-#                    summary="Obtener un Cliente por su numero de registro")
-# def get_partner_by_registration_number(registration_number: str, db: Session = Depends(get_db)):
-#     return get_one_by_registration_number(registration_number=registration_number, db=db)
-
-@partner_route.post("/partners", summary="Crear un Cliente")
+# @partner_route.post("/partners", summary="Crear un Cliente")
+@partner_route.post("/partners", response_model=ResultObject, summary="Crear un Cliente")
 def create_partner(request:Request, partner: PartnerBase, db: Session = Depends(get_db)):
     return new(request=request, partner=partner, db=db)
 
-@partner_route.delete("/partners/{id}", status_code=status.HTTP_200_OK, summary="Desactivar un Cliente por su ID")
+# @partner_route.delete("/partners/{id}", status_code=status.HTTP_200_OK, summary="Desactivar un Cliente por su ID")
+@partner_route.delete("/partners/{id}", response_model=ResultObject, summary="Desactivar un Cliente por su ID")
 def delete_partner(request:Request, id: uuid.UUID, db: Session = Depends(get_db)):
     is_delete = delete(request=request, partner_id=str(id), db=db)
     if is_delete:
@@ -46,6 +45,6 @@ def delete_partner(request:Request, id: uuid.UUID, db: Session = Depends(get_db)
     else:
         raise HTTPException(status_code=404, detail="Cliente no encontrado")
 
-@partner_route.put("/partners/{id}", summary="Actualizar un Cliente por su ID")
+@partner_route.put("/partners/{id}", response_model=ResultObject, summary="Actualizar un Cliente por su ID")
 def update_partner(request:Request, id: str, partner: PartnerBase, db: Session = Depends(get_db)):
     return update(request=request, partner_id=id, partner=partner, db=db)

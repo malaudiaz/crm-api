@@ -7,6 +7,7 @@ from fastapi import HTTPException
 from ...models.partner.partner import Partner
 from ...models.partner.contacto import PartnerContact
 from ...schemas.partner.partner import PartnerBase, PartnerShema
+from ...schemas.resources.result_object import ResultObject
 from ...services.partner.contact import asociate_partner_contact_with_object, update_partner_contact_with_object
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
@@ -16,6 +17,8 @@ from ...auth_bearer import decodeJWT
 from typing import List
 
 def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db: Session):  
+    
+    result = ResultObject(page=page, per_page=per_page)  
     
     str_where = "WHERE is_active=True " 
     str_count = "Select count(*) FROM partner.partners "
@@ -35,23 +38,30 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
     str_count += str_where 
     str_query += str_where
     
-    total = db.execute(str_count).scalar()
-    total_pages=total/per_page if (total % per_page == 0) else math.trunc(total / per_page) + 1
+    result.total = db.execute(str_count).scalar()
+    result.total_pages=result.total/result.per_page if (result.total % result.per_page == 0) else math.trunc(result.total / result.per_page) + 1
     
-    str_query += " ORDER BY name LIMIT " + str(per_page) + " OFFSET " + str(page*per_page-per_page)
+    str_query += " ORDER BY name LIMIT " + str(result.per_page) + " OFFSET " + str(result.page*result.per_page-result.per_page)
      
     lst_data = db.execute(str_query)
-    data = []
+    result.data = []
     for item in lst_data:
-        data.append({'id': item['id'], 'name' : item['name'], 'address': item['address'], 
-                     'dni': item['dni'], 'email': item['email'], 'phone': item['phone'], 
-                     'mobile': item['mobile'], 'nit': item['nit'], 'is_provider': item['is_provider'], 
-                     'created_by': item['created_by'], 'nit': item['nit'], 'registration_number': item['registration_number'], 
-                     'type': item['type'], 'registration_user': item['registration_user'], 
-                     'registration_date': item['registration_date'],  'selected': False})
+        result.data.append(
+            {'id': item['id'], 'name' : item['name'], 'address': item['address'], 
+             'dni': item['dni'], 'email': item['email'], 'phone': item['phone'], 
+             'mobile': item['mobile'], 'nit': item['nit'], 'is_provider': item['is_provider'], 
+             'created_by': item['created_by'], 'nit': item['nit'], 'registration_number': item['registration_number'], 
+             'type': item['type'], 'registration_user': item['registration_user'], 
+             'registration_date': item['registration_date'],  'selected': False})
     
-    return {"page": page, "per_page": per_page, "total": total, "total_pages": total_pages, "data": data}
+    return result
 
+def get_one_partner(partner_id: str, db: Session):  
+    result = ResultObject()
+    result.data = {}
+    result.data = get_one(partner_id=partner_id, db=db)
+    return result
+    
 def get_one(partner_id: str, db: Session):  
     return db.query(Partner).filter(Partner.id == partner_id).first()
 
@@ -60,6 +70,7 @@ def get_one_by_registration_number(registration_number: str, db: Session):
 
 def new(request, db: Session, partner: PartnerBase):
     
+    result = ResultObject() 
     currentUser = get_current_user(request) 
     
     db_partner = Partner(type=partner.type, name=partner.name, address=partner.address, dni=partner.dni, 
@@ -79,7 +90,7 @@ def new(request, db: Session, partner: PartnerBase):
                 asociate_partner_contact_with_object(
                     partner_id=db_partner.id, contact=item_co, user_name=currentUser['username'], db=db)
                 
-        return True
+        return result
     except (Exception, SQLAlchemyError, IntegrityError) as e:
         print(e)
         msg = 'Ha ocurrido un error al crear el cliente'               
@@ -87,6 +98,7 @@ def new(request, db: Session, partner: PartnerBase):
     
 def delete(request, partner_id: str, db: Session):
     
+    result = ResultObject()
     currentUser = get_current_user(request) 
     
     try:
@@ -94,13 +106,14 @@ def delete(request, partner_id: str, db: Session):
         db_partner.is_active = False
         db_partner.updated_by = currentUser['username']
         db.commit()
-        return True
+        return result
     except (Exception, SQLAlchemyError) as e:
         print(e)
         raise HTTPException(status_code=404, detail="No es posible eliminar")
     
 def update(request, partner_id: str, partner: PartnerBase, db: Session):
     
+    result = ResultObject()
     currentUser = get_current_user(request) 
        
     db_partner = db.query(Partner).filter(Partner.id == partner_id).first()
@@ -129,7 +142,7 @@ def update(request, partner_id: str, partner: PartnerBase, db: Session):
         if partner.contacts:
             update_partner_contact_with_object(
                     partner_id=db_partner.id, contacts=partner.contacts, user_name=currentUser['username'], db=db)
-        return True
+        return result
     except (Exception, SQLAlchemyError) as e:
         print(e.code)
         if e.code == "gkpj":

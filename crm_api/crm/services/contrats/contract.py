@@ -5,6 +5,7 @@ from unicodedata import name
 from fastapi import HTTPException
 from ...models.contracts.contract import Contract
 from ...schemas.contracts.contracts import ContractBase, ContractShema
+from ...schemas.resources.result_object import ResultObject
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from passlib.context import CryptContext
@@ -16,6 +17,8 @@ from ...services.partner.partners import get_one as partner_get_one
 from ...services.partner.contact import get_one as contact_get_one
 
 def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db: Session):  
+    
+    result = ResultObject(page=page, per_page=per_page)  
     
     str_where = " WHERE cont.is_active=True "
     str_inner = " INNER JOIN partner.partners pa ON pa.id = cont.id_partner " \
@@ -44,28 +47,36 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
     str_count += str_where 
     str_query += str_where
     
-    total = db.execute(str_count).scalar()
-    total_pages=total/per_page if (total % per_page == 0) else math.trunc(total / per_page) + 1
+    result.total = db.execute(str_count).scalar()
+    result.total_pages=result.total/result.per_page if (result.total % result.per_page == 0) else math.trunc(result.total / result.per_page) + 1
     
-    str_query += " ORDER BY number LIMIT " + str(per_page) + " OFFSET " + str(page*per_page-per_page)
+    str_query += " ORDER BY number LIMIT " + str(result.per_page) + " OFFSET " + str(result.page*result.per_page-result.per_page)
     
     lst_data = db.execute(str_query)
-    data = []
+    result.data = []
     for item in lst_data:
-        data.append({'id': item['id'], 'number' : item['number'], 'partner': item['partner_name'], 'partner_id': item['partner_id'], 
-                     'contact': item['contact_name'], 'contact_id': item['contact_id'], 'sign_by': item['sign_by'], 'sign_full_name': item['sign_full_name'], 
-                     'sign_date': item['sign_date'], 
-                     'initial_aproved_import': item['initial_aproved_import'], 'real_aproved_import': item['real_aproved_import'],  
-                     'real_import': item['real_import'], 'selected': False, 'status_name': item['status_name'], 
-                    "status_description": item['status_description']})
+        result.data.append(
+            {'id': item['id'], 'number' : item['number'], 'partner': item['partner_name'], 'partner_id': item['partner_id'], 
+             'contact': item['contact_name'], 'contact_id': item['contact_id'], 'sign_by': item['sign_by'], 'sign_full_name': item['sign_full_name'], 
+             'sign_date': item['sign_date'], 
+             'initial_aproved_import': item['initial_aproved_import'], 'real_aproved_import': item['real_aproved_import'],  
+             'real_import': item['real_import'], 'selected': False, 'status_name': item['status_name'], 
+             "status_description": item['status_description']})
     
-    return {"page": page, "per_page": per_page, "total": total, "total_pages": total_pages, "data": data}
+    return result
+    
+def get_one_contract(contract_id: str, db: Session):  
+    result = ResultObject()
+    result.data = {}
+    result.data = get_one(contract_id=contract_id, db=db)
+    return result
     
 def get_one(contract_id: str, db: Session):  
     return db.query(Contract).filter(Contract.id == contract_id).first()
 
 def new(request, db: Session, contract: ContractBase):
     
+    result = ResultObject() 
     currentUser = get_current_user(request) 
     
     db_contract = Contract(number=contract.number, id_partner=contract.id_partner, id_contact=contract.id_contact, sign_by=contract.sign_by,
@@ -78,26 +89,30 @@ def new(request, db: Session, contract: ContractBase):
         db.add(db_contract)
         db.commit()
         db.refresh(db_contract)
-        return db_contract
+        return result
     except (Exception, SQLAlchemyError, IntegrityError) as e:
         print(e)
         msg = 'Ha ocurrido un error al crear el contrato'               
         raise HTTPException(status_code=403, detail=msg)
     
 def delete(contract_id: str, db: Session):
+    result = ResultObject() 
+    
     try:
-        db_contract = db.query(Contract).filter(Contract.id == contract_id).first()
+        db_contract = get_one(contract_id=contract_id, db=db)
         db_contract.is_active = False
         db_contract.updated_by = 'foo'
         db.commit()
-        return True
+        return result
     except (Exception, SQLAlchemyError) as e:
         print(e)
         raise HTTPException(status_code=404, detail="No es posible eliminar")
     
 def update(contract_id: str, contract: ContractBase, db: Session):
        
-    db_contract = db.query(Contract).filter(Contract.id == contract_id).first()
+    result = ResultObject() 
+       
+    db_contract = get_one(contract_id=contract_id, db=db)
     db_contract.updated_by = 'foo'
     db_contract.number=contract.number
     db_contract.id_partner=contract.id_partner
@@ -114,7 +129,7 @@ def update(contract_id: str, contract: ContractBase, db: Session):
         db.add(db_contract)
         db.commit()
         db.refresh(db_contract)
-        return db_contract
+        return result
     except (Exception, SQLAlchemyError) as e:
         print(e.code)
         if e.code == "gkpj":

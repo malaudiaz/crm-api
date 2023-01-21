@@ -101,7 +101,7 @@ def new(request, db: Session, user: UserCreate):
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
-        return result # db_user
+        return result
     except (Exception, SQLAlchemyError, IntegrityError) as e:
         print(e)
         msg = 'Ha ocurrido un error al crear el usuario'
@@ -120,7 +120,7 @@ def get_one(user_id: str, db: Session):
     result = ResultObject() 
     result.data = {}
     result.data = db.query(Users).filter(Users.id == user_id).first()
-    return result #db.query(Users).filter(Users.id == user_id).first()
+    return result
 
 def get_one_by_username(username: str, db: Session):  
     return db.query(Users).filter(Users.username == username, Users.is_active == True).first()
@@ -131,7 +131,7 @@ def get_all_user_sign_contracts(db: Session):
     lst_data = db.query(Users).filter(Users.sign_contracts == True).all()
     for item in lst_data:
         result.data.append({'id': item.id, 'username' : item.username, 'fullname': item.fullname})
-    return result #data
+    return result
 
 def delete(user_id: str, db: Session):
     
@@ -162,7 +162,7 @@ def update(user_id: str, user: UserBase, db: Session):
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
-        return result # db_user
+        return result
     except (Exception, SQLAlchemyError) as e:
         print(e.code)
         if e.code == "gkpj":
@@ -173,8 +173,7 @@ def change_password(request, db: Session, password: ChagePasswordSchema):
     result = ResultObject() 
     
     # if el user_name viene vacio cojo el usario logueado
-    
-    # si el usuario logueado es distinto al user_name (se trata de un admon, no hace falta contraseña anterior)
+     # si el usuario logueado es distinto al user_name (se trata de un admon, no hace falta contraseña anterior)
     verify_current_pasw = True
     if not password.username:
         currentUser = get_current_user(request)

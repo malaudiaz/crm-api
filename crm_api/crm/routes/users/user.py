@@ -28,22 +28,18 @@ def get_users(
 ):
     return get_all(page=page, per_page=per_page, criteria_key=criteria_key, criteria_value=criteria_value, db=db)
 
-# @user_route.post("/users", response_model=UserShema, summary="Crear un Usuario")
 @user_route.post("/users", response_model=ResultObject, summary="Crear un Usuario")
 def create_user(request:Request, user: UserCreate, db: Session = Depends(get_db)):    
     return new(request=request, user=user, db=db)
 
-# @user_route.get("/users/{id}", response_model=UserShema, summary="Obtener un Usuario por su ID")
 @user_route.get("/users/{id}", response_model=ResultObject, summary="Obtener un Usuario por su ID")
 def get_user_by_id(id: str, db: Session = Depends(get_db)):
     return get_one(user_id=id, db=db)
 
-# @user_route.get("/users/contracts/", summary="Obtener Usuarios que firman contratos")
 @user_route.get("/users/contracts/", response_model=ResultObject, summary="Obtener Usuarios que firman contratos")
 def get_users_sign_contracts(db: Session = Depends(get_db)):
     return get_all_user_sign_contracts(db=db)
 
-# @user_route.delete("/users/{id}", status_code=status.HTTP_200_OK, summary="Eliminar un Usuario por su ID")
 @user_route.delete("/users/{id}", response_model=ResultObject, summary="Eliminar un Usuario por su ID")
 def delete_user(id: uuid.UUID, db: Session = Depends(get_db)):
     is_delete = delete(user_id=str(id), db=db)
@@ -52,12 +48,10 @@ def delete_user(id: uuid.UUID, db: Session = Depends(get_db)):
     else:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-# @user_route.put("/users/{id}", response_model=UserShema, summary="Actualizar un Usuario por su ID")
 @user_route.put("/users/{id}", response_model=ResultObject, summary="Actualizar un Usuario por su ID")
 def update_user(id: uuid.UUID, user: UserBase, db: Session = Depends(get_db)):
     return update(db=db, user_id=str(id), user=user)
 
-# @user_route.post("/users/password", summary="Cambiar passwoord a un Usuario")
 @user_route.post("/users/password", response_model=ResultObject, summary="Cambiar passwoord a un Usuario")
 def reset_password(
     request:Request,
@@ -66,4 +60,3 @@ def reset_password(
 ):
     return change_password(
         request=request, db=db, password=password)
-

@@ -5,15 +5,16 @@ from unicodedata import name
 from fastapi import HTTPException
 from ...models.partner.contacto import Contact, PartnerContact
 from ...schemas.partner.contact import ContactBase, ContactShema, PartnerContactBase, PartnerContactRelation, ContactCreate
+from ...schemas.resources.result_object import ResultObject
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from passlib.context import CryptContext
 from ...auth_bearer import decodeJWT
 from typing import List
 
-# from ...services.partner.partners import get_one as partner_get_one
-
 def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db: Session):  
+    
+    result = ResultObject(page=page, per_page=per_page)  
         
     str_where = "WHERE is_active=True " 
     str_count = "Select count(*) FROM partner.contacts "
@@ -32,25 +33,33 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
     str_count += str_where 
     str_query += str_where
     
-    total = db.execute(str_count).scalar()
-    total_pages=total/per_page if (total % per_page == 0) else math.trunc(total / per_page) + 1
+    result.total = db.execute(str_count).scalar()
+    result.total_pages=result.total/result.per_page if (result.total % result.per_page == 0) else math.trunc(result.total / result.per_page) + 1
     
-    str_query += " ORDER BY name LIMIT " + str(per_page) + " OFFSET " + str(page*per_page-per_page)
+    str_query += " ORDER BY name LIMIT " + str(result.per_page) + " OFFSET " + str(result.page*result.per_page-result.per_page)
      
     lst_data = db.execute(str_query)
-    data = []
+    result.data = []
     for item in lst_data:
-        data.append({'id': item['id'], 'name' : item['name'], 'address': item['address'], 
-                     'dni': item['dni'], 'email': item['email'], 'phone': item['phone'], 
-                     'mobile': item['mobile'], 'job': item['job'], 'selected': False})
+        result.data.append(
+            {'id': item['id'], 'name' : item['name'], 'address': item['address'], 
+             'dni': item['dni'], 'email': item['email'], 'phone': item['phone'], 
+             'mobile': item['mobile'], 'job': item['job'], 'selected': False})
     
-    return {"page": page, "per_page": per_page, "total": total, "total_pages": total_pages, "data": data}
-    
-def get_one(contact_id: str, db: Session): 
-    
-    return db.query(Contact).filter(Contact.id == contact_id).first()
+    return result
 
+def get_one_contact(contact_id: str, db: Session): 
+    result = ResultObject()
+    result.data = {}
+    result.data = get_one(contact_id=contact_id, db=db)
+    return result
+
+def get_one(contact_id: str, db: Session): 
+    return db.query(Contact).filter(Contact.id == contact_id).first()
+    
 def get_contacts_by_partner(page: int, per_page: int, partner_id: str, db: Session): 
+    
+    result = ResultObject(page=page, per_page=per_page)  
     
     str_where = "WHERE con.is_active=True AND id_partner = '" + partner_id + "' "
     str_count = "SELECT count(id_partner) FROM partner.partners_contacts pac " \
@@ -63,21 +72,24 @@ def get_contacts_by_partner(page: int, per_page: int, partner_id: str, db: Sessi
     str_count += str_where 
     str_query += str_where
     
-    total = db.execute(str_count).scalar()
-    total_pages=total/per_page if (total % per_page == 0) else math.trunc(total / per_page) + 1
+    result.total = db.execute(str_count).scalar()
+    result.total_pages=result.total/result.per_page if (result.total % result.per_page == 0) else math.trunc(result.total / result.per_page) + 1
     
-    str_query += " ORDER BY name LIMIT " + str(per_page) + " OFFSET " + str(page*per_page-per_page)
+    str_query += " ORDER BY name LIMIT " + str(result.per_page) + " OFFSET " + str(result.page*result.per_page-result.per_page)
      
     lst_data = db.execute(str_query)
-    data = []
+    result.data = []
     for item in lst_data:
-        data.append({'id': item['id_contact'], 'name' : item['name'], 'address': item['address'], 
-                     'dni': item['dni'], 'email': item['email'], 'phone': item['phone'], 
-                     'mobile': item['mobile'], 'job': item['job'], 'selected': False})
+        result.data.append(
+            {'id': item['id_contact'], 'name' : item['name'], 'address': item['address'], 
+             'dni': item['dni'], 'email': item['email'], 'phone': item['phone'], 
+             'mobile': item['mobile'], 'job': item['job'], 'selected': False})
     
-    return {"page": page, "per_page": per_page, "total": total, "total_pages": total_pages, "data": data}
-
+    return result
+    
 def get_lst_contacts_by_partner_id(partner_id: str, db: Session): 
+    
+    result = ResultObject()
     
     str_query = "SELECT id_contact, name, address, dni, email, phone, mobile, job " \
         "FROM partner.partners_contacts pac " \
@@ -86,13 +98,14 @@ def get_lst_contacts_by_partner_id(partner_id: str, db: Session):
         "ORDER BY name"
     
     lst_data = db.execute(str_query)
-    data = []
+    result.data = []
     for item in lst_data:
-        data.append({'id': item['id_contact'], 'name' : item['name'], 'address': item['address'], 
-                     'dni': item['dni'], 'email': item['email'], 'phone': item['phone'], 
-                     'mobile': item['mobile'], 'job': item['job'], 'selected': False})
+        result.data.append({
+            'id': item['id_contact'], 'name' : item['name'], 'address': item['address'], 
+            'dni': item['dni'], 'email': item['email'], 'phone': item['phone'], 
+            'mobile': item['mobile'], 'job': item['job'], 'selected': False})
     
-    return data
+    return result
 
 def get_lst_contact_id_by_partner_id(partner_id: str, db: Session): 
     
@@ -110,6 +123,8 @@ def get_lst_contact_id_by_partner_id(partner_id: str, db: Session):
 
 def new(db: Session, contact: ContactBase):
     
+    result = ResultObject()
+    
     db_contact = Contact(name=contact.name, job=contact.job, address=contact.address, dni=contact.dni, 
                          email=contact.email, phone=contact.phone, mobile=contact.mobile, 
                          created_by='foo', updated_by='foo')
@@ -118,7 +133,7 @@ def new(db: Session, contact: ContactBase):
         db.add(db_contact)
         db.commit()
         db.refresh(db_contact)
-        return db_contact
+        return result
     except (Exception, SQLAlchemyError, IntegrityError) as e:
         print(e)
         msg = 'Ha ocurrido un error al crear el contacto'               
@@ -141,19 +156,23 @@ def create_contact(db: Session, contact: ContactCreate, user_name: str):
         raise HTTPException(status_code=403, detail=msg)
     
 def delete(contact_id: str, db: Session):
+    result = ResultObject()
+    
     try:
-        db_contact = db.query(Contact).filter(Contact.id == contact_id).first()
+        db_contact = get_one(contact_id=contact_id, db=db)
         db_contact.is_active = False
         db_contact.updated_by = 'foo'
         db.commit()
-        return True
+        return result
     except (Exception, SQLAlchemyError) as e:
         print(e)
         raise HTTPException(status_code=404, detail="No es posible eliminar")
     
 def update(contact_id: str, contact: ContactBase, db: Session):
+    
+    result = ResultObject()
        
-    db_contact = db.query(Contact).filter(Contact.id == contact_id).first()
+    db_contact = get_one(contact_id=contact_id, db=db)
     db_contact.updated_by = 'foo'
     db_contact.name=contact.name
     db_contact.job= contact.job
@@ -167,7 +186,7 @@ def update(contact_id: str, contact: ContactBase, db: Session):
         db.add(db_contact)
         db.commit()
         db.refresh(db_contact)
-        return db_contact
+        return result
     except (Exception, SQLAlchemyError) as e:
         print(e.code)
         if e.code == "gkpj":
@@ -175,9 +194,7 @@ def update(contact_id: str, contact: ContactBase, db: Session):
    
 def asociate_partner_contact(partnercontact: PartnerContactBase, db: Session):
     
-    # partner = partner_get_one(partnercontact.id_partner, db=db)
-    # if not partner:
-    #     raise HTTPException(status_code=400, detail="No Existe Cliente con ese ID")
+    result = ResultObject()
     
     contact = get_one(partnercontact.id_contact, db=db)
     if not contact:
@@ -194,13 +211,15 @@ def asociate_partner_contact(partnercontact: PartnerContactBase, db: Session):
         db.add(db_partnercontact)
         db.commit()
         db.refresh(db_partnercontact)
-        return True
+        return result
     except (Exception, SQLAlchemyError, IntegrityError) as e:
         print(e)
         msg = 'Ha ocurrido un error al asociar el cliente y su contacto'               
         raise HTTPException(status_code=403, detail=msg)
     
 def desasociate_partner_contact(partnercontactdelete: PartnerContactRelation, db: Session):
+    
+    result = ResultObject()
     
     # partner = partner_get_one(partnercontactdelete.id_partner, db=db)
     # if not partner:
@@ -218,21 +237,23 @@ def desasociate_partner_contact(partnercontactdelete: PartnerContactRelation, db
     try:
         db.delete(db_partnercontact)
         db.commit()
-        return True
+        return result
     except (Exception, SQLAlchemyError) as e:
         print(e)
         raise HTTPException(status_code=404, detail="No es posible eliminar")
 
 def desasociate_partner_one_contact(partner_id: str, contact_id:str, db: Session):
     
+    result = ResultObject()
+    
     db_partnercontact = db.query(PartnerContact).filter_by(id_partner = partner_id, id_contact = contact_id).first()
     if not db_partnercontact:
-        return True
+        return result
     
     try:
         db.delete(db_partnercontact)
         db.commit()
-        return True
+        return result
     except (Exception, SQLAlchemyError) as e:
         print(e)
         raise HTTPException(status_code=404, detail="No es posible eliminar")

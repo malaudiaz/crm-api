@@ -1,6 +1,7 @@
 # app.py
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Header
+from pyi18n import PyI18n
 from crm.config.config import settings
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
@@ -8,6 +9,7 @@ from logging.config import dictConfig
 from crm.config.db import SessionLocal
 from fastapi.openapi.docs import (get_redoc_html, get_swagger_ui_html, get_swagger_ui_oauth2_redirect_html)
 from fastapi.staticfiles import StaticFiles
+from typing import Callable
 
 dictConfig(settings.log_config)
 
@@ -17,6 +19,10 @@ app = FastAPI(
     version=settings.app_version,
     docs_url=None, redoc_url=None
 )
+
+i18n: PyI18n = PyI18n(('en', 'es'), load_path="/crm_api/crm/locales/")
+
+_: Callable = i18n.gettext
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -84,3 +90,10 @@ app.include_router(movement_route, prefix="/api/stock/movement")
 app.include_router(product_route, prefix="/api/stock/product")
 app.include_router(measure_route, prefix="/api/stock/measure")
 app.include_router(contract_route, prefix="/api")
+
+@app.get("/hello/{name}")
+def hello_name(request: Request, name: str):
+    locale = request.headers["accept-language"].split("-")[0];
+    # locale: str = get_user_locale(name)
+    return {"greeting": _(locale, "greetings.hello_name", name=name)}
+

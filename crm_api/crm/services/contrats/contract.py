@@ -32,9 +32,9 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
         "FROM contract.contracts cont "
     
     dict_query = {'number': " AND number ilike '%" + criteria_value + "%'",
-                  'status_name': " AND status_name = '" + criteria_value + "'",
-                  'partner_name': " AND pa.name ilike '%" + criteria_value + "%'",
-                  'contact_name': " AND co.name ilike '%" + criteria_value + "%'"}
+                  'status_description': " AND st.description ilike '%" + criteria_value + "%'",
+                  'partner': " AND pa.name ilike '%" + criteria_value + "%'",
+                  'contact': " AND co.name ilike '%" + criteria_value + "%'"}
     
     if criteria_key and criteria_key not in dict_query:
         raise HTTPException(status_code=404, detail="Parametro no válido")
@@ -51,7 +51,7 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
     result.total_pages=result.total/result.per_page if (result.total % result.per_page == 0) else math.trunc(result.total / result.per_page) + 1
     
     str_query += " ORDER BY number LIMIT " + str(result.per_page) + " OFFSET " + str(result.page*result.per_page-result.per_page)
-    
+        
     lst_data = db.execute(str_query)
     result.data = []
     for item in lst_data:

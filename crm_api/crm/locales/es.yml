@@ -14,3 +14,7 @@ es:
     already_exist: "Ya existe un usuario con este Nombre"
     imposible_delete: "No es posible eliminar"
     not_found: "Usuario no encontrado"
+    check_password: "La contraseña nueva y la confirmación no coinciden"
+    new_password: "Error en el nuevo password, "
+    change_password_error: "Error cambiando password en BD"
+    wrong_password: "Contraseña incorrecta"    

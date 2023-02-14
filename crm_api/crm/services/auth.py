@@ -1,5 +1,5 @@
 # auth.py
-from fastapi import HTTPException, Header
+from fastapi import HTTPException, Header, Request
 # from crm_api.crm.models.users.user import Users
 # from ..models.users.user import  Users
 from ..models.users.user import Users
@@ -25,7 +25,9 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 #     captcha = str(request.session.get("captcha"))
 #     return captcha.upper() == text.upper()
 
-def auth(db: Session, user: UserLogin): 
+def auth(request: Request, db: Session, user: UserLogin): 
+    locale = request.headers["accept-language"].split(",")[0].split("-")[0];
+    
     data = db.query(Users).filter(Users.username == user.username).first()
     if data is None:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")

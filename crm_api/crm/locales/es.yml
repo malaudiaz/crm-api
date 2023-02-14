@@ -1,0 +1,20 @@
+es:
+  bearer:    
+    scheme: "Esquema de autentificación incorrecto"
+    token: "Token erróneo o vencido"
+    credential: "Código de autorización erróneo."
+  auth:
+    me: 'Obtiene información del usuario autentificado'    
+    not_found: "Usuario no encontrado"
+    wrong_password: "Contraseña incorrecta"    
+  users:
+    invalid_param: "Parametro no válido"
+    data_error: "Error en los datos, "
+    new_user_error: "Ha ocurrido un error al crear el usuario"
+    already_exist: "Ya existe un usuario con este Nombre"
+    imposible_delete: "No es posible eliminar"
+    not_found: "Usuario no encontrado"
+    check_password: "La contraseña nueva y la confirmación no coinciden"
+    new_password: "Error en el nuevo password, "
+    change_password_error: "Error cambiando password en BD"
+    wrong_password: "Contraseña incorrecta"    

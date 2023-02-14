@@ -31,8 +31,8 @@ auth_routes = APIRouter()
 #         raise HTTPException(status_code=403, detail="Captcha Incorrecto")    
 
 @auth_routes.post("/login", status_code=status.HTTP_200_OK, tags=["Autentificación"], summary="Autentificación en la API")
-def login(user: UserLogin, db: Session = Depends(get_db)):
-    return auth(db=db, user=user)
+def login(request:Request, user: UserLogin, db: Session = Depends(get_db)):
+    return auth(request=request, db=db, user=user)
 
 @auth_routes.get('/me', summary='Obtiene información del usuario autentificado', tags=["Autentificación"], dependencies=[Depends(JWTBearer())])
 async def get_me(request:Request):

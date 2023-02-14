@@ -1,0 +1,20 @@
+en:
+  bearer: 
+    scheme: "Invalid authentication scheme."
+    token: "Invalid token or expired token."
+    credential: "Invalid authorization code."
+  auth:
+    me: 'Get information for the auth user'
+    not_found: "User not found"
+    wrong_password: "Wrong Password"        
+  users:
+    invalid_param: "Invalid Parameter"
+    data_error: "Invalid Data, "    
+    new_user_error: "An error occurred while creating the user"
+    already_exist: "There is already a user with this Name"
+    imposible_delete: "It is not possible to delete"
+    not_found: "User not found"
+    check_password: "New password and confirmation do not match"
+    new_password: "Error in the new password, "
+    change_password_error: "Error changing password in BD"
+    wrong_password: "Incorrect password"    

@@ -26,17 +26,14 @@ def get_partners(
 ):
     return get_all(page=page, per_page=per_page, criteria_key=criteria_key, criteria_value=criteria_value, db=db)
     
-# @partner_route.get("/partners/{id}", response_model=PartnerShema, summary="Obtener un Cliente por su ID")
 @partner_route.get("/partners/{id}", response_model=ResultObject, summary="Obtener un Cliente por su ID")
 def get_partner_by_id(id: str, db: Session = Depends(get_db)):
     return get_one_partner(partner_id=id, db=db)
 
-# @partner_route.post("/partners", summary="Crear un Cliente")
 @partner_route.post("/partners", response_model=ResultObject, summary="Crear un Cliente")
 def create_partner(request:Request, partner: PartnerBase, db: Session = Depends(get_db)):
     return new(request=request, partner=partner, db=db)
 
-# @partner_route.delete("/partners/{id}", status_code=status.HTTP_200_OK, summary="Desactivar un Cliente por su ID")
 @partner_route.delete("/partners/{id}", response_model=ResultObject, summary="Desactivar un Cliente por su ID")
 def delete_partner(request:Request, id: uuid.UUID, db: Session = Depends(get_db)):
     is_delete = delete(request=request, partner_id=str(id), db=db)

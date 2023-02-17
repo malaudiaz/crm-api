@@ -104,16 +104,7 @@ def new(request, db: Session, user: UserCreate):
         return result
     except (Exception, SQLAlchemyError, IntegrityError) as e:
         print(e)
-        msg = 'Ha ocurrido un error al crear el usuario'
-        if e.code == 'gkpj':
-            field_name = str(e.__dict__['orig']).split('"')[1].split('_')[1]
-            if field_name == 'username':
-                msg = msg + ', el nombre de usuario ya existe'
-            elif field_name == 'dni':
-                msg = msg + ', el dni ya existe'
-            elif field_name == 'email':
-                msg = msg + ', el email ya existe'
-        
+        msg = 'Ha ocurrido un error al crear el usuario'       
         raise HTTPException(status_code=403, detail=msg)
     
 def get_one(user_id: str, db: Session):  

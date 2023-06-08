@@ -10,7 +10,7 @@ from passlib.context import CryptContext
 from ...auth_bearer import decodeJWT
 from typing import List
 import math
-from ...schemas.resources.result_object import ResultObject
+from ...schemas.resources.result_object import ResultObject, ResultData
 
 # def get_all(request: List[ProductSchema], skip: int, limit: int, db: Session):  
 #     lst = db.query(Product).offset(skip).limit(limit).all()                  
@@ -42,7 +42,7 @@ def get_one(product_id: str, db: Session):
 
 def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db: Session):  
     
-    result = ResultObject(page=page, per_page=per_page)  
+    result = ResultData(page=page, per_page=per_page)  
     
     str_where = "WHERE p.is_active=True " 
     str_count = "Select count(*) FROM stock.products p "

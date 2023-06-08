@@ -11,12 +11,12 @@ from ...auth_bearer import decodeJWT
 from crm.functions_jwt import get_current_user
 from typing import List
 import math
-from ...schemas.resources.result_object import ResultObject
+from ...schemas.resources.result_object import ResultObject, ResultData
 
        
 def new(request, db: Session, offer: OfferBase):
     
-    result = ResultObject() 
+    result = ResultData() 
     currentUser = get_current_user(request) 
     db_offer = Offer(code=offer.code, name=offer.name, description=offer.description, 
                      cost_price=offer.cost_price, sale_price=offer.sale_price, 
@@ -36,9 +36,9 @@ def new(request, db: Session, offer: OfferBase):
 def get_one(offer_id: str, db: Session):  
     return db.query(Offer).filter(Offer.id == offer_id).first()
 
-def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db: Session):  
+def get_all(page: int, per_page: int, total: int, total_pages: int, criteria_key: str, criteria_value: str, db: Session):  
     
-    result = ResultObject(page=page, per_page=per_page)  
+    result = ResultData(page=page, per_page=per_page, total=total, total_pages=total_pages)  
     
     str_where = "WHERE t.is_active=True " 
     str_count = "Select count(*) FROM offer.offers t "
@@ -95,7 +95,7 @@ def delete(request, offer_id: str, db: Session):
     
 def update(request, offer_id: str, offer: OfferBase, db: Session):
        
-    result = ResultObject() 
+    result = ResultData() 
     currentUser = get_current_user(request)
     db_offer = db.query(Offer).filter(Offer.id == offer_id).first()
     db_offer.updated_by = currentUser['username']

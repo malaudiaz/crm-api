@@ -5,7 +5,7 @@ from unicodedata import name
 from fastapi import HTTPException
 from ...models.partner.contacto import Contact, PartnerContact
 from ...schemas.partner.contact import ContactBase, ContactShema, PartnerContactBase, PartnerContactRelation, ContactCreate
-from ...schemas.resources.result_object import ResultObject
+from ...schemas.resources.result_object import ResultObject, ResultData
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from passlib.context import CryptContext
@@ -14,7 +14,7 @@ from typing import List
 
 def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db: Session):  
     
-    result = ResultObject(page=page, per_page=per_page)  
+    result = ResultData(page=page, per_page=per_page)  
         
     str_where = "WHERE is_active=True " 
     str_count = "Select count(*) FROM partner.contacts "
@@ -49,7 +49,7 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
     return result
 
 def get_one_contact(contact_id: str, db: Session): 
-    result = ResultObject()
+    result = ResultData()
     result.data = {}
     result.data = get_one(contact_id=contact_id, db=db)
     return result
@@ -59,7 +59,7 @@ def get_one(contact_id: str, db: Session):
     
 def get_contacts_by_partner(page: int, per_page: int, partner_id: str, db: Session): 
     
-    result = ResultObject(page=page, per_page=per_page)  
+    result = ResultData(page=page, per_page=per_page)  
     
     str_where = "WHERE con.is_active=True AND id_partner = '" + partner_id + "' "
     str_count = "SELECT count(id_partner) FROM partner.partners_contacts pac " \
@@ -89,7 +89,7 @@ def get_contacts_by_partner(page: int, per_page: int, partner_id: str, db: Sessi
     
 def get_lst_contacts_by_partner_id(partner_id: str, db: Session): 
     
-    result = ResultObject()
+    result = ResultData()
     
     str_query = "SELECT id_contact, name, address, dni, email, phone, mobile, job " \
         "FROM partner.partners_contacts pac " \
@@ -123,7 +123,7 @@ def get_lst_contact_id_by_partner_id(partner_id: str, db: Session):
 
 def new(db: Session, contact: ContactBase):
     
-    result = ResultObject()
+    result = ResultData()
     
     db_contact = Contact(name=contact.name, job=contact.job, address=contact.address, dni=contact.dni, 
                          email=contact.email, phone=contact.phone, mobile=contact.mobile, 
@@ -156,7 +156,7 @@ def create_contact(db: Session, contact: ContactCreate, user_name: str):
         raise HTTPException(status_code=403, detail=msg)
     
 def delete(contact_id: str, db: Session):
-    result = ResultObject()
+    result = ResultData()
     
     try:
         db_contact = get_one(contact_id=contact_id, db=db)
@@ -170,7 +170,7 @@ def delete(contact_id: str, db: Session):
     
 def update(contact_id: str, contact: ContactBase, db: Session):
     
-    result = ResultObject()
+    result = ResultData()
        
     db_contact = get_one(contact_id=contact_id, db=db)
     db_contact.updated_by = 'foo'
@@ -194,7 +194,7 @@ def update(contact_id: str, contact: ContactBase, db: Session):
    
 def asociate_partner_contact(partnercontact: PartnerContactBase, db: Session):
     
-    result = ResultObject()
+    result = ResultData()
     
     contact = get_one(partnercontact.id_contact, db=db)
     if not contact:
@@ -219,7 +219,7 @@ def asociate_partner_contact(partnercontact: PartnerContactBase, db: Session):
     
 def desasociate_partner_contact(partnercontactdelete: PartnerContactRelation, db: Session):
     
-    result = ResultObject()
+    result = ResultData()
     
     # partner = partner_get_one(partnercontactdelete.id_partner, db=db)
     # if not partner:
@@ -244,7 +244,7 @@ def desasociate_partner_contact(partnercontactdelete: PartnerContactRelation, db
 
 def desasociate_partner_one_contact(partner_id: str, contact_id:str, db: Session):
     
-    result = ResultObject()
+    result = ResultData()
     
     db_partnercontact = db.query(PartnerContact).filter_by(id_partner = partner_id, id_contact = contact_id).first()
     if not db_partnercontact:

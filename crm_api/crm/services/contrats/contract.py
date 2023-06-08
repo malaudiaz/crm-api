@@ -5,7 +5,7 @@ from unicodedata import name
 from fastapi import HTTPException
 from ...models.contracts.contract import Contract
 from ...schemas.contracts.contracts import ContractBase, ContractShema
-from ...schemas.resources.result_object import ResultObject
+from ...schemas.resources.result_object import ResultObject, ResultData
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from passlib.context import CryptContext
@@ -16,9 +16,9 @@ from typing import List
 from ...services.partner.partners import get_one as partner_get_one
 from ...services.partner.contact import get_one as contact_get_one
 
-def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db: Session):  
+def get_all(page: int, per_page: int, total: int, total_pages: int, criteria_key: str, criteria_value: str, db: Session):  
     
-    result = ResultObject(page=page, per_page=per_page)  
+    result = ResultData(page=page, per_page=per_page, total=total, total_pages=total_pages)  
     
     str_where = " WHERE cont.is_active=True "
     str_inner = " INNER JOIN partner.partners pa ON pa.id = cont.id_partner " \
@@ -66,7 +66,7 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
     return result
     
 def get_one_contract(contract_id: str, db: Session):  
-    result = ResultObject()
+    result = ResultData()
     result.data = {}
     result.data = get_one(contract_id=contract_id, db=db)
     return result
@@ -76,7 +76,7 @@ def get_one(contract_id: str, db: Session):
 
 def new(request, db: Session, contract: ContractBase):
     
-    result = ResultObject() 
+    result = ResultData() 
     currentUser = get_current_user(request) 
     
     db_contract = Contract(number=contract.number, id_partner=contract.id_partner, id_contact=contract.id_contact, sign_by=contract.sign_by,
@@ -96,7 +96,7 @@ def new(request, db: Session, contract: ContractBase):
         raise HTTPException(status_code=403, detail=msg)
     
 def delete(contract_id: str, db: Session):
-    result = ResultObject() 
+    result = ResultData() 
     
     try:
         db_contract = get_one(contract_id=contract_id, db=db)
@@ -110,7 +110,7 @@ def delete(contract_id: str, db: Session):
     
 def update(contract_id: str, contract: ContractBase, db: Session):
        
-    result = ResultObject() 
+    result = ResultData() 
        
     db_contract = get_one(contract_id=contract_id, db=db)
     db_contract.updated_by = 'foo'

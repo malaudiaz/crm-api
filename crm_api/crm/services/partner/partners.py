@@ -7,7 +7,7 @@ from fastapi import HTTPException
 from ...models.partner.partner import Partner
 from ...models.partner.contacto import PartnerContact
 from ...schemas.partner.partner import PartnerBase, PartnerShema
-from ...schemas.resources.result_object import ResultObject
+from ...schemas.resources.result_object import ResultObject, ResultData
 from ...services.partner.contact import asociate_partner_contact_with_object, update_partner_contact_with_object
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
@@ -16,9 +16,9 @@ from crm.functions_jwt import get_current_user
 from ...auth_bearer import decodeJWT
 from typing import List
 
-def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db: Session):  
+def get_all(page: int, per_page: int, total: int, total_pages: int, criteria_key: str, criteria_value: str, db: Session):  
     
-    result = ResultObject(page=page, per_page=per_page)  
+    result = ResultData(page=page, per_page=per_page, total=total, total_pages=total_pages)  
     
     str_where = "WHERE is_active=True " 
     str_count = "Select count(*) FROM partner.partners "
@@ -57,7 +57,7 @@ def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db
     return result
 
 def get_one_partner(partner_id: str, db: Session):  
-    result = ResultObject()
+    result = ResultData()
     result.data = {}
     result.data = get_one(partner_id=partner_id, db=db)
     return result
@@ -70,7 +70,7 @@ def get_one_by_registration_number(registration_number: str, db: Session):
 
 def new(request, db: Session, partner: PartnerBase):
     
-    result = ResultObject() 
+    result = ResultData() 
     currentUser = get_current_user(request) 
     
     db_partner = Partner(type=partner.type, name=partner.name, address=partner.address, dni=partner.dni, 
@@ -98,7 +98,7 @@ def new(request, db: Session, partner: PartnerBase):
     
 def delete(request, partner_id: str, db: Session):
     
-    result = ResultObject()
+    result = ResultData()
     currentUser = get_current_user(request) 
     
     try:
@@ -113,7 +113,7 @@ def delete(request, partner_id: str, db: Session):
     
 def update(request, partner_id: str, partner: PartnerBase, db: Session):
     
-    result = ResultObject()
+    result = ResultData()
     currentUser = get_current_user(request) 
        
     db_partner = db.query(Partner).filter(Partner.id == partner_id).first()

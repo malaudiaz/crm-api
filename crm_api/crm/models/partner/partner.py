@@ -4,7 +4,7 @@ from datetime import datetime
 from email.policy import default
 import uuid
 from sqlalchemy import Column, ForeignKey, Integer
-from sqlalchemy.sql.sqltypes import String, Boolean, DateTime, Integer, Date
+from sqlalchemy.sql.sqltypes import String, Boolean, DateTime, Integer, Date, Text
 from ...config.db import Base
 from sqlalchemy.orm import relationship
 
@@ -40,8 +40,6 @@ class Partner(Base):
     contacts = relationship("PartnerContact", back_populates="partner")
     contracts = relationship("Contract", back_populates="partner")
     
-    # skeleton_id = Column(String, ForeignKey("enterprise.skeleton.id"), comment="Departamento del Usuario")   # FK added    
-        
     def dict(self):
         return {
             "id": self.id,
@@ -65,5 +63,3 @@ class Partner(Base):
             "selected": self.selected
         }
     
-# Base.metadata.create_all(bind=engine)
-        

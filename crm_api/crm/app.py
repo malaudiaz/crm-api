@@ -51,6 +51,7 @@ from crm.routes.stock.movement import movement_route
 from crm.routes.stock.product import product_route
 from crm.routes.stock.measure import measure_route
 from crm.routes.contracts.contract import contract_route
+from crm.routes.offers.offer import offer_route
 
 @app.get("/docs", include_in_schema=False)
 async def custom_swagger_ui_html():
@@ -90,6 +91,7 @@ app.include_router(movement_route, prefix="/api/stock/movement")
 app.include_router(product_route, prefix="/api/stock/product")
 app.include_router(measure_route, prefix="/api/stock/measure")
 app.include_router(contract_route, prefix="/api")
+app.include_router(offer_route, prefix="/api")
 
 @app.get("/hello/{name}")
 def hello_name(request: Request, name: str):

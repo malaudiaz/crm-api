@@ -1,1 +1,10 @@
-{}
+{
+    "python.autoComplete.extraPaths": [
+        
+    ],
+    "python.analysis.autoFormatStrings": true,
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.addImport.exactMatchOnly": true,
+    "python.analysis.completeFunctionParens": true,
+    "python.analysis.diagnosticMode": "workspace"
+}

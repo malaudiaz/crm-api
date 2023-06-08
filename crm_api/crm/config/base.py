@@ -12,3 +12,4 @@ from ..models.stock.movement import *
 from ..models.stock.product import *
 from ..models.stock.measure import *
 from ..models.contracts.contract import *
+from ..models.offers.offer import *

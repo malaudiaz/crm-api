@@ -8,6 +8,7 @@ from typing import List
 from ...services.stock.product import get_all, new, get_one, delete, update
 from starlette import status
 from ...auth_bearer import JWTBearer
+from ...schemas.resources.result_object import ResultObject
 import uuid
   
 product_route = APIRouter(
@@ -15,14 +16,15 @@ product_route = APIRouter(
     # dependencies=[Depends(JWTBearer())]   
 )
 
-@product_route.get("/product", response_model=List[ProductSchema], summary="Obtener lista de Productos")
+@product_route.get("/product", response_model=ResultObject, summary="Obtener lista de Productos")
 def get_products(
-    request: Request,
-    skip: int = 0, 
-    limit: int = 100, 
+    page: int = 1, 
+    per_page: int = 6, 
+    criteria_key: str = "",
+    criteria_value: str = "", 
     db: Session = Depends(get_db)
 ):
-    return get_all(request=request, skip=skip, limit=limit, db=db)
+    return get_all(page=page, per_page=per_page, criteria_key=criteria_key, criteria_value=criteria_value, db=db)
 
 @product_route.post("/product", response_model=ProductSchema, summary="Crear un Producto")
 def create_product(product: ProductBase, db: Session = Depends(get_db)):

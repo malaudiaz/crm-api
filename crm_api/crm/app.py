@@ -51,6 +51,7 @@ from crm.routes.stock.movement import movement_route
 from crm.routes.stock.product import product_route
 from crm.routes.stock.measure import measure_route
 from crm.routes.contracts.contract import contract_route
+from crm.routes.resources.currency import currency_route
 
 @app.get("/docs", include_in_schema=False)
 async def custom_swagger_ui_html():
@@ -90,10 +91,5 @@ app.include_router(movement_route, prefix="/api/stock/movement")
 app.include_router(product_route, prefix="/api/stock/product")
 app.include_router(measure_route, prefix="/api/stock/measure")
 app.include_router(contract_route, prefix="/api")
-
-@app.get("/hello/{name}")
-def hello_name(request: Request, name: str):
-    locale = request.headers["accept-language"].split(",")[0].split("-")[0];
-    # locale: str = get_user_locale(name)
-    return {"greeting": _(locale, "greetings.hello_name", name=name)}
+app.include_router(currency_route, prefix="/api")
 

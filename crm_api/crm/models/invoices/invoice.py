@@ -29,9 +29,6 @@ class Invoice(Base):
     updated_by = Column(String(50), nullable=False)
     updated_date = Column(DateTime, nullable=False, default=datetime.now())
     
-    # skeleton_id = Column(String, ForeignKey("enterprise.skeleton.id"), comment="Departamento del Usuario")   # FK added  
-    # partner_id = Column(String), models.ForeignKey("app.Model", verbose_name=_(""), on_delete=models.CASCADE)  
-        
     def dict(self):
         return {
             "id": self.id,

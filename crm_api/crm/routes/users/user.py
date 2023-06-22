@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from crm.schemas.users.user import UserShema, UserCreate, UserBase, ChagePasswordSchema
-from crm.schemas.resources.result_object import ResultObject
+from crm.schemas.resources.result_object import ResultObject, ResultData
 from sqlalchemy.orm import Session
 from crm.app import get_db
 from typing import List, Dict
@@ -18,15 +18,17 @@ user_route = APIRouter(
     dependencies=[Depends(JWTBearer())]   
 )
 
-@user_route.get("/users", response_model=ResultObject, summary="Obtener lista de Usuarios")
+@user_route.get("/users", response_model=ResultData, summary="Obtener lista de Usuarios")
 def get_users(
     page: int = 1, 
     per_page: int = 6, 
+    total: int = 0,
+    total_pages: int = 0,
     criteria_key: str = "",
     criteria_value: str = "",
     db: Session = Depends(get_db)
 ):
-    return get_all(page=page, per_page=per_page, criteria_key=criteria_key, criteria_value=criteria_value, db=db)
+    return get_all(page=page, per_page=per_page, total=total, total_pages=total_pages, criteria_key=criteria_key, criteria_value=criteria_value, db=db)
 
 @user_route.post("/users", response_model=ResultObject, summary="Crear un Usuario")
 def create_user(request:Request, user: UserCreate, db: Session = Depends(get_db)):    

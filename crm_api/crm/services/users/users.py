@@ -52,7 +52,7 @@ def password_check(passwd, min_len, max_len):
 
 def get_all(page: int, per_page: int, total: int, total_pages: int, criteria_key: str, criteria_value: str, db: Session):    
       
-    result = ResultObject(page=page, per_page=per_page)  
+    result = ResultData(page=page, per_page=per_page)  
     str_where = "WHERE is_active=True " 
     str_count = "Select count(*) FROM enterprise.users "
     str_query = "Select id, username, fullname, dni, email, job, phone, password FROM enterprise.users "

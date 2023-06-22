@@ -20,11 +20,13 @@ partner_route = APIRouter(
 def get_partners(
     page: int = 1, 
     per_page: int = 6, 
+    total: int = 0,
+    total_pages: int = 0,
     criteria_key: str = "",
     criteria_value: str = "",
     db: Session = Depends(get_db)
 ):
-    return get_all(page=page, per_page=per_page, criteria_key=criteria_key, criteria_value=criteria_value, db=db)
+    return get_all(page=page, per_page=per_page, total=total, total_pages=total_pages, criteria_key=criteria_key, criteria_value=criteria_value, db=db)
     
 @partner_route.get("/partners/{id}", response_model=ResultData, summary="Obtener un Cliente por su ID")
 def get_partner_by_id(id: str, db: Session = Depends(get_db)):

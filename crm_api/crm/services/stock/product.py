@@ -40,9 +40,9 @@ def new(db: Session, product: ProductBase):
 def get_one(product_id: str, db: Session):  
     return db.query(Product).filter(Product.id == product_id).first()
 
-def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db: Session):  
+def get_all(page: int, per_page: int, total: int, total_pages: int, criteria_key: str, criteria_value: str, db: Session):  
     
-    result = ResultData(page=page, per_page=per_page)  
+    result = ResultData(page=page, per_page=per_page, total=total, total_pages=total_pages)  
     
     str_where = "WHERE p.is_active=True " 
     str_count = "Select count(*) FROM stock.products p "

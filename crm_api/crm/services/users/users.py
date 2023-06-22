@@ -3,7 +3,7 @@
 from fastapi import HTTPException
 from crm.models.users.user import Users
 from crm.schemas.users.user import UserCreate, UserBase, ChagePasswordSchema
-from crm.schemas.resources.result_object import ResultObject
+from crm.schemas.resources.result_object import ResultObject, ResultData
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from passlib.context import CryptContext
@@ -50,7 +50,7 @@ def password_check(passwd, min_len, max_len):
 
     return RespObj
 
-def get_all(page: int, per_page: int, criteria_key: str, criteria_value: str, db: Session):    
+def get_all(page: int, per_page: int, total: int, total_pages: int, criteria_key: str, criteria_value: str, db: Session):    
       
     result = ResultObject(page=page, per_page=per_page)  
     str_where = "WHERE is_active=True " 

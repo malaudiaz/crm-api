@@ -2,6 +2,7 @@
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from ...schemas.stock.measure import MeasureBase, MeasureSchema
+from crm.schemas.resources.result_object import ResultObject, ResultData
 from sqlalchemy.orm import Session
 from ...app import get_db
 from typing import List
@@ -15,14 +16,12 @@ measure_route = APIRouter(
     # dependencies=[Depends(JWTBearer())]   
 )
 
-@measure_route.get("/measure", response_model=List[MeasureSchema], summary="Obtener lista de Unidades de Medidas")
+@measure_route.get("/measures", response_model=ResultObject, summary="Obtener lista de Unidades de Medidas")
 def get_measure(
     request: Request,
-    skip: int = 0, 
-    limit: int = 100, 
     db: Session = Depends(get_db)
 ):
-    return get_all(request=request, skip=skip, limit=limit, db=db)
+    return get_all(request=request, db=db)
 
 @measure_route.post("/measure", response_model=MeasureSchema, summary="Crear una Unidad de Medida")
 def create_measure(measure: MeasureBase, db: Session = Depends(get_db)):

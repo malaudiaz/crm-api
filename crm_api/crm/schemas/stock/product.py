@@ -11,11 +11,11 @@ class ProductBase(BaseModel):
     code: str
     name: str
     description: str
-    measure_id: int
-    unit_price: float
-    cost_price: Optional[float]
-    sale_price: Optional[float]
-    ledger_account: str
+    measure_id: Optional[str]
+    unit_price: Optional[str]
+    cost_price: Optional[str]
+    sale_price: Optional[str]
+    ledger_account: Optional[str]
 
     @validator('name')
     def name_is_not_null(cls, name):

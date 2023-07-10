@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from ...schemas.offers.offer import OfferBase, OfferSchema
-from ...schemas.resources.result_object import ResultObject
+from ...schemas.resources.result_object import ResultObject, ResultData
 from sqlalchemy.orm import Session
 from ...app import get_db
 from typing import List, Dict, Any
@@ -16,7 +16,7 @@ offer_route = APIRouter(
     dependencies=[Depends(JWTBearer())]
 )
 
-@offer_route.get("/offers", response_model=ResultObject, summary="Obtener lista de Ofertas")
+@offer_route.get("/offers", response_model=ResultData, summary="Obtener lista de Ofertas")
 def get_offers(
     page: int = 1, 
     per_page: int = 6, 

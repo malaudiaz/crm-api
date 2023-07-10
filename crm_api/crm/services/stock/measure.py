@@ -4,19 +4,23 @@ from unicodedata import name
 from fastapi import HTTPException
 from ...models.stock.measure import Measure
 from ...schemas.stock.measure import MeasureBase, MeasureSchema
+from crm.schemas.resources.result_object import ResultObject, ResultData
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from passlib.context import CryptContext
 from ...auth_bearer import decodeJWT
 from typing import List
 
-def get_all(request: List[MeasureSchema], skip: int, limit: int, db: Session):  
-    lst = db.query(Measure).offset(skip).limit(limit).all()                  
-    
+def get_all(request: List[MeasureSchema], db: Session):  
+    result = ResultObject() 
+    result.data = []
+    lst = db.query(Measure).all()                  
+    for item in lst:
+        result.data.append({'id': item.id, 'name' : item.name, 'description': item.description})
     # data = []
     # for item in lst:
     #     data.append(item.dict())
-    return lst
+    return result
         
 def new(db: Session, measure: MeasureBase):
     
